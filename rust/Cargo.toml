@@ -1,0 +1,14 @@
+[workspace]
+members = ["crates/*"]
+
+[profile.release]
+#debug = true
+lto = true
+#opt-level = "s"
+codegen-units = 1
+#panic = "abort"
+
+# [profile.release.package.wasm]
+# opt-level = 3
+#opt-level = "s"
+#debugging = true
