@@ -15,7 +15,7 @@ specifiers:
   typedoc: ^0.20.28
   typescript: ^4.4.4
   vite: ^2.7.10
-  vitest: ^0.2.4
+  vitest: ^0.12.6
 
 dependencies:
   react: registry.npmjs.org/react/17.0.2
@@ -34,7 +34,7 @@ devDependencies:
   typedoc: registry.npmjs.org/typedoc/0.20.37_typescript@4.7.2
   typescript: registry.npmjs.org/typescript/4.7.2
   vite: registry.npmjs.org/vite/2.9.9
-  vitest: registry.npmjs.org/vitest/0.2.8
+  vitest: registry.npmjs.org/vitest/0.12.10
 
 packages:
 
@@ -3169,10 +3169,10 @@ packages:
     engines: {node: '>=14.0.0'}
     dev: true
 
-  registry.npmjs.org/tinyspy/0.2.10:
-    resolution: {integrity: sha512-Qij6rGWCDjWIejxCXXVi6bNgvrYBp3PbqC4cBP/0fD6WHDOHCw09Zd13CsxrDqSR5PFq01WeqDws8t5lz5sH0A==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/tinyspy/-/tinyspy-0.2.10.tgz}
+  registry.npmjs.org/tinyspy/0.3.2:
+    resolution: {integrity: sha512-2+40EP4D3sFYy42UkgkFFB+kiX2Tg3URG/lVvAZFfLxgGpnWl5qQJuBw1gaLttq8UOS+2p3C0WrhJnQigLTT2Q==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/tinyspy/-/tinyspy-0.3.2.tgz}
     name: tinyspy
-    version: 0.2.10
+    version: 0.3.2
     engines: {node: '>=14.0.0'}
     dev: true
 
@@ -3408,11 +3408,11 @@ packages:
       fsevents: registry.npmjs.org/fsevents/2.3.2
     dev: true
 
-  registry.npmjs.org/vitest/0.2.8:
-    resolution: {integrity: sha512-shzN00EkvUNzP8cSykhrOCwB7MlGxcwJNjOtHhbayvexGnqX6oLOfEp3OQixWdDJpEaqNiE3Lcie0WsOnoQ3Og==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/vitest/-/vitest-0.2.8.tgz}
+  registry.npmjs.org/vitest/0.12.10:
+    resolution: {integrity: sha512-TVoI6fM7rZ1zIMDjcviY8Dg5XIaPqBwDweaI3oUwvWqUz68cbM49CIHNMkF+UVoSjl94wXiBRdNhsT4ekgWuGA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/vitest/-/vitest-0.12.10.tgz}
     name: vitest
-    version: 0.2.8
-    engines: {node: '>=14.14.0'}
+    version: 0.12.10
+    engines: {node: '>=v14.16.0'}
     hasBin: true
     peerDependencies:
       '@vitest/ui': '*'
@@ -3432,14 +3432,16 @@ packages:
       '@types/chai': registry.npmjs.org/@types/chai/4.3.1
       '@types/chai-subset': registry.npmjs.org/@types/chai-subset/1.3.3
       chai: registry.npmjs.org/chai/4.3.6
+      debug: registry.npmjs.org/debug/4.3.4
       local-pkg: registry.npmjs.org/local-pkg/0.4.1
       tinypool: registry.npmjs.org/tinypool/0.1.3
-      tinyspy: registry.npmjs.org/tinyspy/0.2.10
+      tinyspy: registry.npmjs.org/tinyspy/0.3.2
       vite: registry.npmjs.org/vite/2.9.9
     transitivePeerDependencies:
       - less
       - sass
       - stylus
+      - supports-color
     dev: true
 
   registry.npmjs.org/vscode-oniguruma/1.6.2:
