@@ -1,0 +1,53 @@
+{
+  "name": "ts-parallel-template",
+  "sideEffects": false,
+  "version": "0.0.1",
+  "description": "",
+  "module": "module/index.js",
+  "main": "lib/index.js",
+  "types": "module/index.d.ts",
+  "source": "./src/index.ts",
+  "scripts": {
+    "start": "vite",
+    "test": "vitest run",
+    "build:wasm": "cd wasm && make build",
+    "build": "pnpm build:wasm && vite build",
+    "doc": "typedoc src/index.ts",
+    "release": "yarn build && standard-version",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "js",
+    "promise",
+    "typescript"
+  ],
+  "license": "ISC",
+  "author": "Zixuan Chen",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zxch3n/ts-boilerplate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zxch3n/ts-boilerplate/issues"
+  },
+  "homepage": "https://github.com/zxch3n/ts-boilerplate#readme",
+  "devDependencies": {
+    "@types/chance": "^1.1.1",
+    "@types/react": "^17.0.33",
+    "@types/react-dom": "^17.0.10",
+    "@vitejs/plugin-react": "^1.0.7",
+    "chance": "^1.1.7",
+    "prettier": "^2.3.2",
+    "standard-version": "^9.3.0",
+    "ts-node": "^9.1.1",
+    "tsup": "^5.11.1",
+    "typedoc": "^0.20.28",
+    "typescript": "^4.4.4",
+    "vite": "^2.7.10",
+    "vitest": "^0.2.4"
+  },
+  "dependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  }
+}
