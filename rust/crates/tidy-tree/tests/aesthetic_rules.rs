@@ -17,6 +17,32 @@ pub fn assert_no_overlap_nodes<D: Debug>(root: &Node<D>) {
     });
 }
 
+pub fn check_nodes_order<D>(root: &Node<D>) {
+    root.pre_order_traversal(|node| {
+        let mut prev = None;
+        for child in node.children.iter() {
+            if let Some(prev) = prev {
+                assert!(prev < child.x);
+            }
+
+            prev = Some(child.x);
+        }
+    })
+}
+
+pub fn check_y_position_in_same_level<D>(root: &Node<D>) {
+    root.pre_order_traversal(|node| {
+        let mut prev = None;
+        for child in node.children.iter() {
+            if let Some(prev) = prev {
+                assert!(prev == child.y);
+            }
+
+            prev = Some(child.y);
+        }
+    })
+}
+
 pub fn assert_no_crossed_lines<D: Debug>(root: &Node<D>) {
     let mut lines: Vec<Line> = vec![];
     root.post_order_traversal(|node| {

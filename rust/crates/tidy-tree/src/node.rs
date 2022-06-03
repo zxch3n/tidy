@@ -8,6 +8,7 @@ pub struct Node<Meta> {
     pub y: isize,
     pub meta: Meta,
     pub parent: Option<NonNull<Node<Meta>>>,
+    /// Children need boxing to get a stable addr in the heap
     pub children: Vec<Box<Node<Meta>>>,
 }
 

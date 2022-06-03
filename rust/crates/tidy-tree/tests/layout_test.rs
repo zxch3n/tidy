@@ -11,6 +11,8 @@ pub fn test_layout<D: Default + Debug + Clone>(layout: &mut dyn Layout<Meta = D>
     aesthetic_rules::assert_no_overlap_nodes(&tree);
     aesthetic_rules::assert_no_crossed_lines(&tree);
     aesthetic_rules::assert_symmetric(&tree, layout);
+    aesthetic_rules::check_nodes_order(&tree);
+    aesthetic_rules::check_y_position_in_same_level(&tree);
 }
 
 pub fn gen_tree<Meta: Default>(rng: &mut StdRng, num: usize) -> Node<Meta> {
