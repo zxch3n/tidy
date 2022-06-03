@@ -13,6 +13,7 @@ pub fn test_layout<D: Default + Debug + Clone>(layout: &mut dyn Layout<Meta = D>
     aesthetic_rules::assert_symmetric(&tree, layout);
     aesthetic_rules::check_nodes_order(&tree);
     aesthetic_rules::check_y_position_in_same_level(&tree);
+    aesthetic_rules::assert_parent_visually_centered(&tree);
 }
 
 pub fn gen_tree<Meta: Default>(rng: &mut StdRng, num: usize) -> Node<Meta> {

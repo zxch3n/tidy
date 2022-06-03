@@ -19,8 +19,12 @@ pub struct BasicLayout {
 pub struct BoundingBox {
     pub total_width: Coord,
     pub total_height: Coord,
+    /// node x position relative to its parent
     pub relative_x: Coord,
+    /// node y position relative to its parent
     pub relative_y: Coord,
+    /// bounding box shift relative to the node
+    pub shift_x: Coord,
 }
 
 impl Default for BoundingBox {
@@ -30,6 +34,7 @@ impl Default for BoundingBox {
             total_width: 0.,
             relative_x: 0.,
             relative_y: 0.,
+            shift_x: 0.,
         }
     }
 }
@@ -65,6 +70,7 @@ impl BasicLayout {
             total_width: node.width,
             relative_x: 0.,
             relative_y: 0.,
+            shift_x: -node.width / 2.,
         };
         let children: *mut _ = &mut node.children;
         let children = unsafe { &mut *children };
@@ -74,18 +80,34 @@ impl BasicLayout {
             for child in children.iter() {
                 total_width += child.meta.total_width;
             }
+
             total_width += (n - 1.) * self.peer_margin;
-            let mut relative_x = -total_width / 2.;
+            let mut relative_x = 0.;
             let mut max_height = 0.;
-            for child in children.iter_mut() {
+            let mut mid_x: Vec<Coord> = vec![];
+            let n = children.len();
+            for (i, child) in children.iter_mut().enumerate() {
                 child.meta.relative_y = node.height + self.parent_child_margin;
-                child.meta.relative_x = relative_x + child.meta.total_width / 2.;
-                relative_x += child.meta.total_width + self.peer_margin;
+                relative_x += -child.meta.shift_x;
+                child.meta.relative_x = relative_x;
+                if i == (n - 1) / 2 {
+                    mid_x.push(relative_x);
+                }
+                if i == n / 2 {
+                    mid_x.push(relative_x);
+                }
+                relative_x += child.meta.total_width + child.meta.shift_x + self.peer_margin;
                 max_height = Float::max(child.meta.total_height, max_height);
+            }
+
+            let shift_x = -(mid_x[0] + mid_x[1]) / 2.;
+            for child in children.iter_mut() {
+                child.meta.relative_x += shift_x;
             }
 
             node.meta.total_width = total_width;
             node.meta.total_height = node.height + self.parent_child_margin + max_height;
+            node.meta.shift_x = shift_x;
         }
     }
 }

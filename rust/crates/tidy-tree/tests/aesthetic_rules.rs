@@ -71,20 +71,40 @@ pub fn assert_no_crossed_lines<D: Debug>(root: &Node<D>) {
     });
 }
 
+pub fn assert_parent_visually_centered<D: Debug>(root: &Node<D>) {
+    root.pre_order_traversal(|node| {
+        let n = node.children.len();
+        if n == 0 {
+            return;
+        }
+
+        let middle = if n % 2 == 0 {
+            let m = n / 2;
+            let a = &node.children[m - 1];
+            let b = &node.children[m];
+            (a.x + b.x) / 2.
+        } else {
+            node.children[n / 2].x
+        };
+        assert!(
+            (node.x - middle).abs() < 1e-6,
+            "parent node is not centered {} {}",
+            node.x,
+            middle
+        );
+    });
+}
+
 pub fn assert_symmetric<D: Debug + Clone>(root: &Node<D>, layout: &mut dyn Layout<Meta = D>) {
     let mut mirrored = mirror(root);
     layout.layout(&mut mirrored);
     let mut point_origin: Vec<Coord> = vec![];
     let mut point_mirrored: Vec<Coord> = vec![];
     root.pre_order_traversal(|node| {
-        if let Some(parent) = node.parent {
-            point_origin.push(node.x);
-        }
+        point_origin.push(node.x);
     });
     pre_order_traversal_rev(&mirrored, |node| {
-        if let Some(parent) = node.parent {
-            point_mirrored.push(node.x);
-        }
+        point_mirrored.push(node.x);
     });
     // println!("{:#?}", root);
     // println!("{:#?}", mirrored);
