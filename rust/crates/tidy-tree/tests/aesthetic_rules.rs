@@ -2,8 +2,8 @@ use std::{fmt::Debug, ptr::NonNull};
 
 use tidy_tree::{geometry::*, Layout, Node};
 
-pub fn assert_no_overlap_nodes<D: Debug>(root: &Node<D>) {
-    let mut nodes: Vec<NonNull<Node<D>>> = vec![];
+pub fn assert_no_overlap_nodes(root: &Node) {
+    let mut nodes: Vec<NonNull<Node>> = vec![];
     root.post_order_traversal(|node| {
         for other in nodes.iter() {
             let other = unsafe { other.as_ref() };
@@ -17,7 +17,7 @@ pub fn assert_no_overlap_nodes<D: Debug>(root: &Node<D>) {
     });
 }
 
-pub fn check_nodes_order<D>(root: &Node<D>) {
+pub fn check_nodes_order(root: &Node) {
     root.pre_order_traversal(|node| {
         let mut prev = None;
         for child in node.children.iter() {
@@ -30,7 +30,7 @@ pub fn check_nodes_order<D>(root: &Node<D>) {
     })
 }
 
-pub fn check_y_position_in_same_level<D>(root: &Node<D>) {
+pub fn check_y_position_in_same_level(root: &Node) {
     root.pre_order_traversal(|node| {
         let mut prev = None;
         for child in node.children.iter() {
@@ -43,7 +43,7 @@ pub fn check_y_position_in_same_level<D>(root: &Node<D>) {
     })
 }
 
-pub fn assert_no_crossed_lines<D: Debug>(root: &Node<D>) {
+pub fn assert_no_crossed_lines(root: &Node) {
     let mut lines: Vec<Line> = vec![];
     root.post_order_traversal(|node| {
         for child in node.children.iter() {
@@ -71,7 +71,7 @@ pub fn assert_no_crossed_lines<D: Debug>(root: &Node<D>) {
     });
 }
 
-pub fn assert_parent_visually_centered<D: Debug>(root: &Node<D>) {
+pub fn assert_parent_visually_centered(root: &Node) {
     root.pre_order_traversal(|node| {
         let n = node.children.len();
         if n == 0 {
@@ -95,7 +95,7 @@ pub fn assert_parent_visually_centered<D: Debug>(root: &Node<D>) {
     });
 }
 
-pub fn assert_symmetric<D: Debug + Clone>(root: &Node<D>, layout: &mut dyn Layout<Meta = D>) {
+pub fn assert_symmetric(root: &Node, layout: &mut dyn Layout) {
     let mut mirrored = mirror(root);
     layout.layout(&mut mirrored);
     let mut point_origin: Vec<Coord> = vec![];
@@ -119,11 +119,11 @@ pub fn assert_symmetric<D: Debug + Clone>(root: &Node<D>, layout: &mut dyn Layou
         )
     }
 
-    fn pre_order_traversal_rev<F, Meta>(node: &Node<Meta>, mut f: F)
+    fn pre_order_traversal_rev<F>(node: &Node, mut f: F)
     where
-        F: FnMut(&Node<Meta>),
+        F: FnMut(&Node),
     {
-        let mut stack: Vec<NonNull<Node<Meta>>> = vec![node.into()];
+        let mut stack: Vec<NonNull<Node>> = vec![node.into()];
         while let Some(mut node) = stack.pop() {
             let node = unsafe { node.as_mut() };
             f(node);
@@ -134,7 +134,7 @@ pub fn assert_symmetric<D: Debug + Clone>(root: &Node<D>, layout: &mut dyn Layou
     }
 }
 
-fn mirror<D: Clone>(root: &Node<D>) -> Node<D> {
+fn mirror(root: &Node) -> Node {
     let mut root = root.clone();
     root.post_order_traversal_mut(|node| {
         let n = node.children.len();

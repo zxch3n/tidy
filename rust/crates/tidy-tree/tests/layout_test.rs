@@ -4,9 +4,9 @@ mod aesthetic_rules;
 use rand::prelude::*;
 use tidy_tree::{geometry::Coord, BasicLayout, Layout, Node};
 
-pub fn test_layout<D: Default + Debug + Clone>(layout: &mut dyn Layout<Meta = D>) {
+pub fn test_layout(layout: &mut dyn Layout) {
     let mut rng = StdRng::seed_from_u64(101);
-    let mut tree = gen_tree::<D>(&mut rng, 1000);
+    let mut tree = gen_tree(&mut rng, 1000);
     layout.layout(&mut tree);
     aesthetic_rules::assert_no_overlap_nodes(&tree);
     aesthetic_rules::assert_no_crossed_lines(&tree);
@@ -16,9 +16,9 @@ pub fn test_layout<D: Default + Debug + Clone>(layout: &mut dyn Layout<Meta = D>
     aesthetic_rules::assert_parent_visually_centered(&tree);
 }
 
-pub fn gen_tree<Meta: Default>(rng: &mut StdRng, num: usize) -> Node<Meta> {
+pub fn gen_tree(rng: &mut StdRng, num: usize) -> Node {
     let root = gen_node(rng);
-    let mut nodes: Vec<NonNull<Node<Meta>>> = vec![(&root).into()];
+    let mut nodes: Vec<NonNull<Node>> = vec![(&root).into()];
     for _ in 0..num {
         let parent_index = rng.gen_range(0..nodes.len());
         let parent = unsafe { nodes[parent_index].as_mut() };
@@ -30,8 +30,9 @@ pub fn gen_tree<Meta: Default>(rng: &mut StdRng, num: usize) -> Node<Meta> {
     root
 }
 
-fn gen_node<Meta: Default>(rng: &mut StdRng) -> Node<Meta> {
+fn gen_node(rng: &mut StdRng) -> Node {
     Node {
+        id: rng.gen(),
         width: rng.gen_range(1..10) as Coord,
         height: rng.gen_range(1..10) as Coord,
         x: 0.,

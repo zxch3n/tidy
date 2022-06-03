@@ -1,16 +1,9 @@
-use std::ptr::NonNull;
-
 use crate::node::Node;
+use std::ptr::NonNull;
+mod basic_layout;
+pub use basic_layout::{BasicLayout, BoundingBox};
 
 pub trait Layout {
-    type Meta;
-    fn layout(&mut self, root: &mut Node<Self::Meta>);
-    fn partial_layout(
-        &mut self,
-        root: &mut Node<Self::Meta>,
-        changed: &[NonNull<Node<Self::Meta>>],
-    );
+    fn layout(&mut self, root: &mut Node);
+    fn partial_layout(&mut self, root: &mut Node, changed: &[NonNull<Node>]);
 }
-
-mod basic_layout;
-pub use basic_layout::BasicLayout;

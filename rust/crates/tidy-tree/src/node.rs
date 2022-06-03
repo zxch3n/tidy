@@ -1,22 +1,24 @@
 use std::ptr::NonNull;
 
-use crate::geometry::Coord;
+use crate::{geometry::Coord, layout::BoundingBox};
 
 #[derive(Debug, Clone)]
-pub struct Node<Meta> {
+pub struct Node {
+    pub id: usize,
     pub width: Coord,
     pub height: Coord,
     pub x: Coord,
     pub y: Coord,
-    pub meta: Meta,
-    pub parent: Option<NonNull<Node<Meta>>>,
+    pub meta: BoundingBox,
+    pub parent: Option<NonNull<Node>>,
     /// Children need boxing to get a stable addr in the heap
-    pub children: Vec<Box<Node<Meta>>>,
+    pub children: Vec<Box<Node>>,
 }
 
-impl<Meta: Default> Default for Node<Meta> {
+impl Default for Node {
     fn default() -> Self {
         Self {
+            id: 0,
             width: 0.,
             height: 0.,
             x: 0.,
@@ -28,9 +30,10 @@ impl<Meta: Default> Default for Node<Meta> {
     }
 }
 
-impl<Meta: Default> Node<Meta> {
-    pub fn new(width: Coord, height: Coord) -> Self {
+impl Node {
+    pub fn new(id: usize, width: Coord, height: Coord) -> Self {
         Node {
+            id,
             width,
             height,
             meta: Default::default(),
@@ -42,7 +45,7 @@ impl<Meta: Default> Node<Meta> {
     }
 }
 
-impl<Meta> Node<Meta> {
+impl Node {
     pub fn append_child(&mut self, mut child: Self) {
         child.parent = Some(self.into());
         self.children.push(Box::new(child));
@@ -57,7 +60,7 @@ impl<Meta> Node<Meta> {
 
     pub fn post_order_traversal<F>(&self, mut f: F)
     where
-        F: FnMut(&Node<Meta>),
+        F: FnMut(&Node),
     {
         let mut stack: Vec<(NonNull<Self>, bool)> = vec![(self.into(), true)];
         while let Some((mut node_ptr, is_first)) = stack.pop() {
@@ -76,7 +79,7 @@ impl<Meta> Node<Meta> {
 
     pub fn post_order_traversal_mut<F>(&mut self, mut f: F)
     where
-        F: FnMut(&mut Node<Meta>),
+        F: FnMut(&mut Node),
     {
         let mut stack: Vec<(NonNull<Self>, bool)> = vec![(self.into(), true)];
         while let Some((mut node_ptr, is_first)) = stack.pop() {
@@ -95,7 +98,7 @@ impl<Meta> Node<Meta> {
 
     pub fn pre_order_traversal<F>(&self, mut f: F)
     where
-        F: FnMut(&Node<Meta>),
+        F: FnMut(&Node),
     {
         let mut stack: Vec<NonNull<Self>> = vec![self.into()];
         while let Some(mut node) = stack.pop() {
@@ -109,7 +112,7 @@ impl<Meta> Node<Meta> {
 
     pub fn pre_order_traversal_mut<F>(&mut self, mut f: F)
     where
-        F: FnMut(&mut Node<Meta>),
+        F: FnMut(&mut Node),
     {
         let mut stack: Vec<NonNull<Self>> = vec![self.into()];
         while let Some(mut node) = stack.pop() {

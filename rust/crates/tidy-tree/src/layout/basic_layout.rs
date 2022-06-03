@@ -40,8 +40,7 @@ impl Default for BoundingBox {
 }
 
 impl Layout for BasicLayout {
-    type Meta = BoundingBox;
-    fn layout(&mut self, root: &mut Node<Self::Meta>) {
+    fn layout(&mut self, root: &mut Node) {
         root.post_order_traversal_mut(|node| {
             self.update_meta(node);
         });
@@ -54,17 +53,13 @@ impl Layout for BasicLayout {
         });
     }
 
-    fn partial_layout(
-        &mut self,
-        root: &mut Node<Self::Meta>,
-        changed: &[std::ptr::NonNull<Node<Self::Meta>>],
-    ) {
+    fn partial_layout(&mut self, root: &mut Node, changed: &[std::ptr::NonNull<Node>]) {
         todo!()
     }
 }
 
 impl BasicLayout {
-    fn update_meta(&mut self, node: &mut Node<BoundingBox>) {
+    fn update_meta(&mut self, node: &mut Node) {
         node.meta = BoundingBox {
             total_height: node.height,
             total_width: node.width,
@@ -119,12 +114,12 @@ mod basic_layout_test {
 
     #[test]
     fn easy_test_0() {
-        let mut root = Node::<BoundingBox>::new(10., 10.);
-        root.append_child(Node::new(10., 10.));
-        let mut second = Node::new(10., 10.);
-        second.append_child(Node::new(10., 10.));
+        let mut root = Node::new(0, 10., 10.);
+        root.append_child(Node::new(1, 10., 10.));
+        let mut second = Node::new(2, 10., 10.);
+        second.append_child(Node::new(3, 10., 10.));
         root.append_child(second);
-        root.append_child(Node::new(10., 10.));
+        root.append_child(Node::new(4, 10., 10.));
         let mut layout = BasicLayout {
             parent_child_margin: 10.,
             peer_margin: 5.,
