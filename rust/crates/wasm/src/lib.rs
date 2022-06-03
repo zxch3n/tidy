@@ -1,29 +1,37 @@
-mod linked_list;
 extern crate wasm_bindgen;
+use tidy_tree::{geometry::Coord, TidyTree, NULL_ID};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-extern "C" {
-    pub fn alert(s: &str);
-}
+pub struct Tidy(TidyTree);
 
 #[wasm_bindgen]
-pub fn greet(name: &str) {
-    unsafe {
-        alert(&format!("Hello, {}!", name));
+impl Tidy {
+    pub fn null_id() -> usize {
+        NULL_ID
     }
-}
 
-#[wasm_bindgen]
-pub fn sum_of_squares(input: &[i32]) -> i32 {
-    input.iter().map(|x| x * x).sum()
-}
+    pub fn with_basic_layout() -> Self {
+        Tidy(TidyTree::with_basic_layout())
+    }
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
+    pub fn add_node(&mut self, id: usize, width: Coord, height: Coord, parent_id: usize) {
+        self.0.add_node(id, width, height, parent_id);
+    }
+
+    pub fn data(&mut self, id: &[usize], width: &[Coord], height: &[Coord], parent_id: &[usize]) {
+        self.0.data(id, width, height, parent_id);
+    }
+
+    pub fn layout(&mut self) {
+        self.0.layout();
+    }
+
+    pub fn get_pos(&self) -> Vec<Coord> {
+        self.0.get_pos()
     }
 }

@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
-import { sumOfSquares, init } from './wasmEntry';
+import { TidyLayout } from './tidy';
 
 function App() {
   const [count, setCount] = useState(0);
   useEffect(() => {
     (async () => {
-      await init();
-      console.log(sumOfSquares(1, 2));
+      console.log();
     })();
   }, []);
 

@@ -63,10 +63,16 @@ impl TidyTree {
         self.layout.layout(&mut self.root);
     }
 
-    pub fn get_pos(&self, id: usize) -> Option<(Coord, Coord)> {
-        let node = self.map.get(&id)?;
-        let node = unsafe { node.as_ref() };
-        Some((node.x, node.y))
+    pub fn get_pos(&self) -> Vec<Coord> {
+        let mut ans = vec![];
+        for (id, node) in self.map.iter() {
+            let node = unsafe { node.as_ref() };
+            ans.push((*id) as Coord);
+            ans.push(node.x);
+            ans.push(node.y);
+        }
+
+        ans
     }
 }
 
