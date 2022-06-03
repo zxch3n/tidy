@@ -35,31 +35,18 @@ jobs:
       - uses: jetli/wasm-pack-action@v0.3.0
         with:
           version: 'latest'
-      - uses: pnpm/action-setup@v2.0.1
-        name: Install pnpm
-        id: pnpm-install
+      - name: Cache dependencies
+        uses: actions/cache@v2
         with:
-          version: 7
-          run_install: false
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: |
-          echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
-
-      - uses: actions/cache@v3
-        name: Setup pnpm cache
-        with:
-          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
+          path: ~/.npm
+          key: npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-
       - name: Install dependencies
-        run: pnpm install
+        run: npm ci --ignore-scripts
       - name: Build
-        run: pnpm build
+        run: npm run build
       - name: Run Tests
-        run: pnpm test
+        run: npm run test
       # - uses: codecov/codecov-action@v1
       #   with:
       #     token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
