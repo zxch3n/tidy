@@ -74,18 +74,16 @@ pub fn assert_no_crossed_lines<D: Debug>(root: &Node<D>) {
 pub fn assert_symmetric<D: Debug + Clone>(root: &Node<D>, layout: &mut dyn Layout<Meta = D>) {
     let mut mirrored = mirror(root);
     layout.layout(&mut mirrored);
-    let mut point_origin: Vec<isize> = vec![];
-    let mut point_mirrored: Vec<isize> = vec![];
+    let mut point_origin: Vec<Coord> = vec![];
+    let mut point_mirrored: Vec<Coord> = vec![];
     root.pre_order_traversal(|node| {
         if let Some(parent) = node.parent {
-            let parent = unsafe { parent.as_ref() };
-            point_origin.push(node.x - parent.x);
+            point_origin.push(node.x);
         }
     });
     pre_order_traversal_rev(&mirrored, |node| {
         if let Some(parent) = node.parent {
-            let parent = unsafe { parent.as_ref() };
-            point_mirrored.push(-node.x + parent.x);
+            point_mirrored.push(node.x);
         }
     });
     // println!("{:#?}", root);
@@ -94,10 +92,10 @@ pub fn assert_symmetric<D: Debug + Clone>(root: &Node<D>, layout: &mut dyn Layou
     assert_eq!(point_origin.len(), point_mirrored.len());
     for i in 0..point_origin.len() {
         assert!(
-            (point_origin[i] - point_mirrored[i]).abs() <= 1,
+            (point_origin[i] + point_mirrored[i]).abs() <= 1e-6,
             "{} != {}",
             point_origin[i],
-            point_mirrored[i]
+            -point_mirrored[i]
         )
     }
 
@@ -122,6 +120,11 @@ fn mirror<D: Clone>(root: &Node<D>) -> Node<D> {
         let n = node.children.len();
         for i in 0..n / 2 {
             node.children.swap(i, n - i - 1);
+        }
+
+        let node_ptr = node.into();
+        for child in node.children.iter_mut() {
+            child.parent = Some(node_ptr);
         }
     });
     root

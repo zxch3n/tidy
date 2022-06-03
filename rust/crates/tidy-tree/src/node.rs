@@ -1,11 +1,13 @@
 use std::ptr::NonNull;
 
+use crate::geometry::Coord;
+
 #[derive(Debug, Clone)]
 pub struct Node<Meta> {
-    pub width: isize,
-    pub height: isize,
-    pub x: isize,
-    pub y: isize,
+    pub width: Coord,
+    pub height: Coord,
+    pub x: Coord,
+    pub y: Coord,
     pub meta: Meta,
     pub parent: Option<NonNull<Node<Meta>>>,
     /// Children need boxing to get a stable addr in the heap
@@ -15,10 +17,10 @@ pub struct Node<Meta> {
 impl<Meta: Default> Default for Node<Meta> {
     fn default() -> Self {
         Self {
-            width: 0,
-            height: 0,
-            x: 0,
-            y: 0,
+            width: 0.,
+            height: 0.,
+            x: 0.,
+            y: 0.,
             children: vec![],
             parent: None,
             meta: Default::default(),
@@ -27,13 +29,13 @@ impl<Meta: Default> Default for Node<Meta> {
 }
 
 impl<Meta: Default> Node<Meta> {
-    pub fn new(width: isize, height: isize) -> Self {
+    pub fn new(width: Coord, height: Coord) -> Self {
         Node {
             width,
             height,
             meta: Default::default(),
-            x: 0,
-            y: 0,
+            x: 0.,
+            y: 0.,
             children: vec![],
             parent: None,
         }

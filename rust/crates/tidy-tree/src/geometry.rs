@@ -1,9 +1,12 @@
+use num::Float;
 use std::cmp::{max, min};
 
-#[derive(PartialEq, Eq, Debug)]
+pub type Coord = f64;
+
+#[derive(PartialEq, Debug)]
 pub struct Point {
-    pub x: isize,
-    pub y: isize,
+    pub x: Coord,
+    pub y: Coord,
 }
 
 #[derive(PartialEq, Eq, Debug)]
@@ -17,9 +20,9 @@ impl Point {
     pub fn orientation(p: &Point, q: &Point, r: &Point) -> Orientation {
         let val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
 
-        if val == 0 {
+        if val.abs() < 1e-7 {
             Orientation::Colinear
-        } else if val > 0 {
+        } else if val > 0. {
             Orientation::ClockWise
         } else {
             Orientation::CounterClockWise
@@ -27,7 +30,7 @@ impl Point {
     }
 }
 
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Debug)]
 pub struct Line {
     pub from: Point,
     pub to: Point,
@@ -38,10 +41,10 @@ impl Line {
         let from = &self.from;
         let to = &self.to;
 
-        point.x >= min(from.x, to.x)
-            && point.x <= max(from.x, to.x)
-            && point.y >= min(from.y, to.y)
-            && point.y <= max(from.y, to.y)
+        point.x >= Float::min(from.x, to.x)
+            && point.x <= Float::max(from.x, to.x)
+            && point.y >= Float::min(from.y, to.y)
+            && point.y <= Float::max(from.y, to.y)
     }
 
     pub fn intersect(&self, other: &Self) -> bool {
@@ -82,72 +85,72 @@ mod test {
     use super::*;
     #[test]
     fn orient() {
-        let a = Point { x: 0, y: 0 };
-        let b = Point { x: 1, y: 0 };
-        let c = Point { x: 0, y: 1 };
+        let a = Point { x: 0., y: 0. };
+        let b = Point { x: 1., y: 0. };
+        let c = Point { x: 0., y: 1. };
         assert_eq!(
             Point::orientation(&a, &b, &c),
             Orientation::CounterClockWise
         );
-        let a = Point { x: 0, y: 0 };
-        let b = Point { x: 0, y: 1 };
-        let c = Point { x: 1, y: 0 };
+        let a = Point { x: 0., y: 0. };
+        let b = Point { x: 0., y: 1. };
+        let c = Point { x: 1., y: 0. };
         assert_eq!(Point::orientation(&a, &b, &c), Orientation::ClockWise);
-        let a = Point { x: 0, y: 0 };
-        let b = Point { x: 1, y: 1 };
-        let c = Point { x: 4, y: 4 };
+        let a = Point { x: 0., y: 0. };
+        let b = Point { x: 1., y: 1. };
+        let c = Point { x: 4., y: 4. };
         assert_eq!(Point::orientation(&a, &b, &c), Orientation::Colinear);
     }
 
     #[test]
     fn intersect() {
         let a = Line {
-            from: Point { x: 0, y: 0 },
-            to: Point { x: 1, y: 0 },
+            from: Point { x: 0., y: 0. },
+            to: Point { x: 1., y: 0. },
         };
         let b = Line {
-            from: Point { x: 1, y: 1 },
-            to: Point { x: 1, y: -1 },
+            from: Point { x: 1., y: 1. },
+            to: Point { x: 1., y: -1. },
         };
         assert!(a.intersect(&b));
 
         let a = Line {
-            from: Point { x: 0, y: 0 },
-            to: Point { x: 1, y: 0 },
+            from: Point { x: 0., y: 0. },
+            to: Point { x: 1., y: 0. },
         };
         let b = Line {
-            from: Point { x: 2, y: 1 },
-            to: Point { x: 1, y: -1 },
+            from: Point { x: 2., y: 1. },
+            to: Point { x: 1., y: -1. },
         };
         assert!(!a.intersect(&b));
 
         let a = Line {
-            from: Point { x: 0, y: 0 },
-            to: Point { x: 1, y: 1 },
+            from: Point { x: 0., y: 0. },
+            to: Point { x: 1., y: 1. },
         };
         let b = Line {
-            from: Point { x: 0, y: 1 },
-            to: Point { x: 1, y: 0 },
+            from: Point { x: 0., y: 1. },
+            to: Point { x: 1., y: 0. },
         };
         assert!(a.intersect(&b));
 
         let a = Line {
-            from: Point { x: 0, y: 0 },
-            to: Point { x: 1, y: 1 },
+            from: Point { x: 0., y: 0. },
+            to: Point { x: 1., y: 1. },
         };
         let b = Line {
-            from: Point { x: 1, y: 1 },
-            to: Point { x: 2, y: 2 },
+            from: Point { x: 1., y: 1. },
+            to: Point { x: 2., y: 2. },
         };
         assert!(a.intersect(&b));
 
         let a = Line {
-            from: Point { x: 0, y: 0 },
-            to: Point { x: 1, y: 1 },
+            from: Point { x: 0., y: 0. },
+            to: Point { x: 1., y: 1. },
         };
         let b = Line {
-            from: Point { x: 2, y: 2 },
-            to: Point { x: 3, y: 3 },
+            from: Point { x: 2., y: 2. },
+            to: Point { x: 3., y: 3. },
         };
         assert!(!a.intersect(&b));
     }

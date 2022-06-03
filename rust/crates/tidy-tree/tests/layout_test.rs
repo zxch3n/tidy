@@ -2,7 +2,7 @@ use std::{fmt::Debug, ptr::NonNull};
 
 mod aesthetic_rules;
 use rand::prelude::*;
-use tidy_tree::{BasicLayout, Layout, Node};
+use tidy_tree::{geometry::Coord, BasicLayout, Layout, Node};
 
 pub fn test_layout<D: Default + Debug + Clone>(layout: &mut dyn Layout<Meta = D>) {
     let mut rng = StdRng::seed_from_u64(101);
@@ -31,10 +31,10 @@ pub fn gen_tree<Meta: Default>(rng: &mut StdRng, num: usize) -> Node<Meta> {
 
 fn gen_node<Meta: Default>(rng: &mut StdRng) -> Node<Meta> {
     Node {
-        width: 10,
-        height: rng.gen_range(1..10),
-        x: 0,
-        y: 0,
+        width: rng.gen_range(1..10) as Coord,
+        height: rng.gen_range(1..10) as Coord,
+        x: 0.,
+        y: 0.,
         meta: Default::default(),
         parent: None,
         children: vec![],
@@ -44,8 +44,8 @@ fn gen_node<Meta: Default>(rng: &mut StdRng) -> Node<Meta> {
 #[test]
 fn test_basic_layout() {
     let mut layout = BasicLayout {
-        parent_child_margin: 10,
-        peer_margin: 10,
+        parent_child_margin: 10.,
+        peer_margin: 10.,
     };
     test_layout(&mut layout);
 }
