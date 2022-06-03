@@ -1,11 +1,27 @@
-import initWasm, { Tidy, Tidy as TidyWasm } from '../wasm_dist/wasm';
+import _initWasm, {
+  InitInput,
+  InitOutput,
+  Tidy,
+  Tidy as TidyWasm,
+} from '../wasm_dist/wasm';
 import { Disposable } from './dispose';
 
 export enum LayoutType {
   Basic = 'basic',
 }
 
-export { initWasm };
+let promise: Promise<InitOutput> | undefined;
+
+export function initWasm(
+  module_or_path?: InitInput | Promise<InitInput>,
+  maybe_memory?: WebAssembly.Memory,
+): Promise<InitOutput> {
+  if (!promise) {
+    promise = _initWasm(module_or_path, maybe_memory);
+  }
+
+  return promise;
+}
 
 export interface Node {
   id?: number;
