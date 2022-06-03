@@ -11,7 +11,7 @@
     "start": "vite",
     "test": "vitest run",
     "build:wasm": "cd rust && make build",
-    "build": "pnpm build:wasm && vite build",
+    "build": "npm run build:wasm && vite build",
     "doc": "typedoc src/index.ts",
     "release": "yarn build && standard-version",
     "typecheck": "tsc --noEmit",
