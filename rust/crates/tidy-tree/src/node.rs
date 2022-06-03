@@ -18,7 +18,7 @@ pub struct Node {
 impl Default for Node {
     fn default() -> Self {
         Self {
-            id: 0,
+            id: usize::MAX,
             width: 0.,
             height: 0.,
             x: 0.,
@@ -46,9 +46,12 @@ impl Node {
 }
 
 impl Node {
-    pub fn append_child(&mut self, mut child: Self) {
+    pub fn append_child(&mut self, mut child: Self) -> NonNull<Self> {
         child.parent = Some(self.into());
-        self.children.push(Box::new(child));
+        let boxed = Box::new(child);
+        let ptr = boxed.as_ref().into();
+        self.children.push(boxed);
+        ptr
     }
 
     pub fn intersects(&self, other: &Self) -> bool {

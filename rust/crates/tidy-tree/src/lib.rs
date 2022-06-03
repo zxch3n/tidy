@@ -4,6 +4,7 @@ mod layout;
 mod node;
 use std::{any::Any, collections::HashMap, ptr::NonNull};
 
+use geometry::Coord;
 use layout::BoundingBox;
 pub use layout::{BasicLayout, Layout};
 pub use node::Node;
@@ -15,7 +16,7 @@ pub struct TidyTree {
 }
 
 impl TidyTree {
-    pub fn new() -> Self {
+    pub fn with_basic_layout() -> Self {
         TidyTree {
             root: Default::default(),
             layout: Box::new(BasicLayout {
@@ -26,8 +27,47 @@ impl TidyTree {
         }
     }
 
-    pub fn layout(&mut self) {}
-    pub fn get_ptr(&self) -> *const Node {
-        &self.root
+    pub fn is_empty(&self) -> bool {
+        self.root.id == usize::MAX
+    }
+
+    pub fn add_node(&mut self, id: usize, width: Coord, height: Coord, parent_id: usize) {
+        let node = Node::new(id, width, height);
+        if self.is_empty() || parent_id == usize::MAX {
+            self.root = node;
+            self.map.insert(id, (&self.root).into());
+            return;
+        }
+
+        let mut parent = *self.map.get(&parent_id).unwrap();
+        let parent = unsafe { parent.as_mut() };
+
+        let ptr = parent.append_child(node);
+        self.map.insert(id, ptr);
+    }
+
+    pub fn data(&mut self, id: &[usize], width: &[Coord], height: &[Coord], parent_id: &[usize]) {
+        for (i, &id) in id.iter().enumerate() {
+            let width = width[i];
+            let height = height[i];
+            let parent_id = parent_id[i];
+            self.add_node(id, width, height, parent_id);
+        }
+    }
+
+    pub fn layout(&mut self) {
+        if self.is_empty() {
+            return;
+        }
+
+        self.layout.layout(&mut self.root);
+    }
+
+    pub fn get_pos(&self, id: usize) -> Option<(Coord, Coord)> {
+        let node = self.map.get(&id)?;
+        let node = unsafe { node.as_ref() };
+        Some((node.x, node.y))
     }
 }
+
+pub const NULL_ID: usize = usize::MAX;

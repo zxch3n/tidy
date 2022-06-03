@@ -6,14 +6,16 @@ use tidy_tree::{geometry::Coord, BasicLayout, Layout, Node};
 
 pub fn test_layout(layout: &mut dyn Layout) {
     let mut rng = StdRng::seed_from_u64(101);
-    let mut tree = gen_tree(&mut rng, 1000);
-    layout.layout(&mut tree);
-    aesthetic_rules::assert_no_overlap_nodes(&tree);
-    aesthetic_rules::assert_no_crossed_lines(&tree);
-    aesthetic_rules::assert_symmetric(&tree, layout);
-    aesthetic_rules::check_nodes_order(&tree);
-    aesthetic_rules::check_y_position_in_same_level(&tree);
-    aesthetic_rules::assert_parent_visually_centered(&tree);
+    for _ in 0..100 {
+        let mut tree = gen_tree(&mut rng, 100);
+        layout.layout(&mut tree);
+        aesthetic_rules::assert_no_overlap_nodes(&tree);
+        aesthetic_rules::assert_no_crossed_lines(&tree);
+        aesthetic_rules::assert_symmetric(&tree, layout);
+        aesthetic_rules::check_nodes_order(&tree);
+        aesthetic_rules::check_y_position_in_same_level(&tree);
+        aesthetic_rules::assert_parent_visually_centered(&tree);
+    }
 }
 
 pub fn gen_tree(rng: &mut StdRng, num: usize) -> Node {
