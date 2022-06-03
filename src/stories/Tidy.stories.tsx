@@ -21,14 +21,14 @@ export const TidyLayout = ({ root, layoutType, ...props }: Props) => {
 };
 
 TidyLayout.args = {
-  root: createTree(100) as Node,
+  root: createTree(200) as Node,
 };
 
 function createNode(): Node {
   return {
     id: (Math.random() * 1e9) | 0,
-    height: 20 * Math.random() + 10,
-    width: 20 * Math.random() + 10,
+    height: 10 * Math.random() + 10,
+    width: 10 * Math.random() + 10,
     x: 0,
     y: 0,
     children: [],
@@ -45,8 +45,8 @@ function createTree(num: number): Node {
     parent.children.push(child);
     child.parentId = parent.id;
     arr.push(child);
-    if (parent.children.length > 5) {
-      arr.splice(parentIndex, 1);
+    if (arr.length > 10) {
+      arr.shift();
     }
   }
 

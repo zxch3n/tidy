@@ -1,4 +1,4 @@
-use std::{fmt::Debug, ptr::NonNull};
+use std::ptr::NonNull;
 
 mod aesthetic_rules;
 use rand::prelude::*;
@@ -14,7 +14,7 @@ pub fn test_layout(layout: &mut dyn Layout) {
         aesthetic_rules::assert_symmetric(&tree, layout);
         aesthetic_rules::check_nodes_order(&tree);
         aesthetic_rules::check_y_position_in_same_level(&tree);
-        aesthetic_rules::assert_parent_visually_centered(&tree);
+        aesthetic_rules::assert_parent_centered(&tree);
     }
 }
 

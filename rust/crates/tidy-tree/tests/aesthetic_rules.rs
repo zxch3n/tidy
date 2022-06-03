@@ -1,4 +1,4 @@
-use std::{fmt::Debug, ptr::NonNull};
+use std::ptr::NonNull;
 
 use tidy_tree::{geometry::*, Layout, Node};
 
@@ -71,27 +71,9 @@ pub fn assert_no_crossed_lines(root: &Node) {
     });
 }
 
-pub fn assert_parent_visually_centered(root: &Node) {
+pub fn assert_parent_centered(root: &Node) {
     root.pre_order_traversal(|node| {
-        let n = node.children.len();
-        if n == 0 {
-            return;
-        }
-
-        let middle = if n % 2 == 0 {
-            let m = n / 2;
-            let a = &node.children[m - 1];
-            let b = &node.children[m];
-            (a.x + b.x) / 2.
-        } else {
-            node.children[n / 2].x
-        };
-        assert!(
-            (node.x - middle).abs() < 1e-6,
-            "parent node is not centered {} {}",
-            node.x,
-            middle
-        );
+        assert!((node.meta.shift_x + node.meta.total_width / 2.).abs() < 1e-6);
     });
 }
 

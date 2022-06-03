@@ -24,7 +24,7 @@ export class Renderer extends Disposable {
     const g = new Group();
     this.render.add(g);
     g.setPosition([this.render.getWidth() / 2, 12]);
-    g.setScale([1.2, 1.2]);
+    g.setScale([0.4, 0.4]);
     visit(root, (node) => {
       const rect = new Rect({
         shape: {

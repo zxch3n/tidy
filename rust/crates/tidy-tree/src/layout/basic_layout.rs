@@ -23,7 +23,7 @@ pub struct BoundingBox {
     pub relative_x: Coord,
     /// node y position relative to its parent
     pub relative_y: Coord,
-    /// bounding box shift relative to the node
+    /// bounding box left position
     pub shift_x: Coord,
 }
 
@@ -79,23 +79,16 @@ impl BasicLayout {
             total_width += (n - 1.) * self.peer_margin;
             let mut relative_x = 0.;
             let mut max_height = 0.;
-            let mut mid_x: Vec<Coord> = vec![];
             let n = children.len();
             for (i, child) in children.iter_mut().enumerate() {
                 child.meta.relative_y = node.height + self.parent_child_margin;
                 relative_x += -child.meta.shift_x;
                 child.meta.relative_x = relative_x;
-                if i == (n - 1) / 2 {
-                    mid_x.push(relative_x);
-                }
-                if i == n / 2 {
-                    mid_x.push(relative_x);
-                }
                 relative_x += child.meta.total_width + child.meta.shift_x + self.peer_margin;
                 max_height = Float::max(child.meta.total_height, max_height);
             }
 
-            let shift_x = -(mid_x[0] + mid_x[1]) / 2.;
+            let shift_x = -total_width / 2.;
             for child in children.iter_mut() {
                 child.meta.relative_x += shift_x;
             }
