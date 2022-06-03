@@ -14,7 +14,9 @@
     "build": "pnpm build:wasm && vite build",
     "doc": "typedoc src/index.ts",
     "release": "yarn build && standard-version",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "keywords": [
     "js",
@@ -32,10 +34,19 @@
   },
   "homepage": "https://github.com/zxch3n/ts-boilerplate#readme",
   "devDependencies": {
+    "@babel/core": "^7.18.2",
+    "@storybook/addon-actions": "^6.5.6",
+    "@storybook/addon-essentials": "^6.5.6",
+    "@storybook/addon-interactions": "^6.5.6",
+    "@storybook/addon-links": "^6.5.6",
+    "@storybook/builder-vite": "^0.1.35",
+    "@storybook/react": "^6.5.6",
+    "@storybook/testing-library": "^0.0.11",
     "@types/chance": "^1.1.1",
     "@types/react": "^17.0.33",
     "@types/react-dom": "^17.0.10",
     "@vitejs/plugin-react": "^1.0.7",
+    "babel-loader": "^8.2.5",
     "chance": "^1.1.7",
     "prettier": "^2.3.2",
     "standard-version": "^9.3.0",
