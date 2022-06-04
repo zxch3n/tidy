@@ -5,6 +5,7 @@ import _initWasm, {
   Tidy as TidyWasm,
 } from '../wasm_dist/wasm';
 import { Disposable } from './dispose';
+import { visit } from './utils';
 
 export enum LayoutType {
   Basic = 'basic',
@@ -74,7 +75,23 @@ export class TidyLayout extends Disposable {
     });
   }
 
-  layout() {
+  layout(updated = false) {
+    if (updated) {
+      visit(this.root!, (node) => {
+        if (this.idToNode.has(node.id)) {
+          return;
+        }
+
+        this.idToNode.set(node.id, node);
+        this.tidy.add_node(
+          node.id,
+          node.width,
+          node.height,
+          node.parentId ?? NULL_ID(),
+        );
+      });
+    }
+
     this.tidy.layout();
     const positions = this.tidy.get_pos();
     for (let i = 0; i < positions.length; i += 3) {

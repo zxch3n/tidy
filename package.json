@@ -58,6 +58,7 @@
     "vitest": "^0.12.6"
   },
   "dependencies": {
+    "immer": "^9.0.14",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "zrender": "^5.3.1"

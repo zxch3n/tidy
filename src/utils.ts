@@ -2,17 +2,22 @@ import { Node } from './tidy';
 
 export function visit<T extends { children: T[] }>(
   node: T,
-  func: (node: T) => void,
+  func: (node: T, depth: number) => void,
+  depth = 0,
 ) {
-  func(node);
+  func(node, depth);
   for (const child of node.children) {
-    visit(child, func);
+    visit(child, func, depth + 1);
   }
 }
 
-function createNode(): Node {
+function randomId(): number {
+  return (Math.random() * 2147483647) | 0;
+}
+
+export function createNode(): Node {
   return {
-    id: (Math.random() * 1e9) | 0,
+    id: randomId(),
     height: 10 * Math.random() + 10,
     width: 10 * Math.random() + 10,
     x: 0,
