@@ -9,7 +9,11 @@ pub struct Node {
     pub height: Coord,
     pub x: Coord,
     pub y: Coord,
-    pub meta: BoundingBox,
+    /// node x position relative to its parent
+    pub relative_x: Coord,
+    /// node y position relative to its parent
+    pub relative_y: Coord,
+    pub bbox: BoundingBox,
     pub parent: Option<NonNull<Node>>,
     /// Children need boxing to get a stable addr in the heap
     pub children: Vec<Box<Node>>,
@@ -23,9 +27,11 @@ impl Default for Node {
             height: 0.,
             x: 0.,
             y: 0.,
+            relative_x: 0.,
+            relative_y: 0.,
             children: vec![],
             parent: None,
-            meta: Default::default(),
+            bbox: Default::default(),
         }
     }
 }
@@ -36,9 +42,11 @@ impl Node {
             id,
             width,
             height,
-            meta: Default::default(),
+            bbox: Default::default(),
             x: 0.,
             y: 0.,
+            relative_x: 0.,
+            relative_y: 0.,
             children: vec![],
             parent: None,
         }

@@ -19,10 +19,6 @@ pub struct BasicLayout {
 pub struct BoundingBox {
     pub total_width: Coord,
     pub total_height: Coord,
-    /// node x position relative to its parent
-    pub relative_x: Coord,
-    /// node y position relative to its parent
-    pub relative_y: Coord,
     /// bounding box left position
     pub shift_x: Coord,
 }
@@ -32,8 +28,6 @@ impl Default for BoundingBox {
         Self {
             total_height: 0.,
             total_width: 0.,
-            relative_x: 0.,
-            relative_y: 0.,
             shift_x: 0.,
         }
     }
@@ -47,8 +41,8 @@ impl Layout for BasicLayout {
         root.pre_order_traversal_mut(|node| {
             if let Some(parent) = node.parent {
                 let parent = unsafe { parent.as_ref() };
-                node.x = parent.x + node.meta.relative_x;
-                node.y = parent.y + node.meta.relative_y;
+                node.x = parent.x + node.relative_x;
+                node.y = parent.y + node.relative_y;
             }
         });
     }
@@ -60,11 +54,9 @@ impl Layout for BasicLayout {
 
 impl BasicLayout {
     fn update_meta(&mut self, node: &mut Node) {
-        node.meta = BoundingBox {
+        node.bbox = BoundingBox {
             total_height: node.height,
             total_width: node.width,
-            relative_x: 0.,
-            relative_y: 0.,
             shift_x: -node.width / 2.,
         };
         let children: *mut _ = &mut node.children;
@@ -73,7 +65,7 @@ impl BasicLayout {
         if n > 0. {
             let mut total_width: Coord = 0.;
             for child in children.iter() {
-                total_width += child.meta.total_width;
+                total_width += child.bbox.total_width;
             }
 
             total_width += (n - 1.) * self.peer_margin;
@@ -81,21 +73,21 @@ impl BasicLayout {
             let mut max_height = 0.;
             let n = children.len();
             for (i, child) in children.iter_mut().enumerate() {
-                child.meta.relative_y = node.height + self.parent_child_margin;
-                relative_x += -child.meta.shift_x;
-                child.meta.relative_x = relative_x;
-                relative_x += child.meta.total_width + child.meta.shift_x + self.peer_margin;
-                max_height = Float::max(child.meta.total_height, max_height);
+                child.relative_y = node.height + self.parent_child_margin;
+                relative_x += -child.bbox.shift_x;
+                child.relative_x = relative_x;
+                relative_x += child.bbox.total_width + child.bbox.shift_x + self.peer_margin;
+                max_height = Float::max(child.bbox.total_height, max_height);
             }
 
             let shift_x = -total_width / 2.;
             for child in children.iter_mut() {
-                child.meta.relative_x += shift_x;
+                child.relative_x += shift_x;
             }
 
-            node.meta.total_width = total_width;
-            node.meta.total_height = node.height + self.parent_child_margin + max_height;
-            node.meta.shift_x = shift_x;
+            node.bbox.total_width = total_width;
+            node.bbox.total_height = node.height + self.parent_child_margin + max_height;
+            node.bbox.shift_x = shift_x;
         }
     }
 }

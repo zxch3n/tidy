@@ -73,7 +73,7 @@ pub fn assert_no_crossed_lines(root: &Node) {
 
 pub fn assert_parent_centered(root: &Node) {
     root.pre_order_traversal(|node| {
-        assert!((node.meta.shift_x + node.meta.total_width / 2.).abs() < 1e-6);
+        assert!((node.bbox.shift_x + node.bbox.total_width / 2.).abs() < 1e-6);
     });
 }
 

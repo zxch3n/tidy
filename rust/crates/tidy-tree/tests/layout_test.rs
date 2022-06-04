@@ -39,7 +39,9 @@ fn gen_node(rng: &mut StdRng) -> Node {
         height: rng.gen_range(1..10) as Coord,
         x: 0.,
         y: 0.,
-        meta: Default::default(),
+        relative_x: 0.,
+        relative_y: 0.,
+        bbox: Default::default(),
         parent: None,
         children: vec![],
     }
