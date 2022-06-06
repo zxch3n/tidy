@@ -3,6 +3,38 @@ use std::ptr::NonNull;
 use crate::{geometry::Coord, layout::BoundingBox};
 
 #[derive(Debug, Clone)]
+pub struct TidyData {
+    pub thread_left: Option<NonNull<Node>>,
+    pub thread_right: Option<NonNull<Node>>,
+    /// ```
+    /// this.extreme_left == this.thread_left.extreme_left ||
+    /// this.extreme_left == this.children[0].extreme_left
+    /// ```
+    pub extreme_left: Option<NonNull<Node>>,
+    /// ```
+    /// this.extreme_right == this.thread_right.extreme_right ||
+    /// this.extreme_right == this.children[-1].extreme_right
+    /// ```
+    pub extreme_right: Option<NonNull<Node>>,
+
+    /// Cached change of x position.
+    pub shift: Coord,
+    /// Cached change of x position
+    pub change: Coord,
+
+    /// this.x = parent.x + modifier_to_subtree
+    pub modifier_to_subtree: Coord,
+    /// this.x + modifier_thread_left == thread_left.x
+    pub modifier_thread_left: Coord,
+    /// this.x + modifier_thread_right == thread_right.x
+    pub modifier_thread_right: Coord,
+    /// this.x + modifier_extreme_left == extreme_left.x
+    pub modifier_extreme_left: Coord,
+    /// this.x + modifier_extreme_right == extreme_right.x
+    pub modifier_extreme_right: Coord,
+}
+
+#[derive(Debug, Clone)]
 pub struct Node {
     pub id: usize,
     pub width: Coord,
@@ -17,6 +49,7 @@ pub struct Node {
     pub parent: Option<NonNull<Node>>,
     /// Children need boxing to get a stable addr in the heap
     pub children: Vec<Box<Node>>,
+    pub tidy: Option<Box<TidyData>>,
 }
 
 impl Default for Node {
@@ -32,6 +65,7 @@ impl Default for Node {
             children: vec![],
             parent: None,
             bbox: Default::default(),
+            tidy: None,
         }
     }
 }
@@ -49,11 +83,20 @@ impl Node {
             relative_y: 0.,
             children: vec![],
             parent: None,
+            tidy: None,
         }
     }
 }
 
 impl Node {
+    pub fn bottom(&self) -> Coord {
+        self.height + self.y
+    }
+
+    pub fn tidy_mut(&mut self) -> &mut TidyData {
+        self.tidy.as_mut().unwrap()
+    }
+
     pub fn append_child(&mut self, mut child: Self) -> NonNull<Self> {
         child.parent = Some(self.into());
         let boxed = Box::new(child);

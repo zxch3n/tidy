@@ -2,6 +2,7 @@
 pub mod geometry;
 mod layout;
 mod node;
+mod utils;
 use std::{any::Any, collections::HashMap, ptr::NonNull};
 
 use geometry::Coord;

@@ -44,6 +44,7 @@ fn gen_node(rng: &mut StdRng) -> Node {
         bbox: Default::default(),
         parent: None,
         children: vec![],
+        tidy: None,
     }
 }
 

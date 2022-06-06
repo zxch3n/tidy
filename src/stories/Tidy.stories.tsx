@@ -52,7 +52,7 @@ export const TidyLayout = ({ root, layoutType, ...props }: Props) => {
 };
 
 TidyLayout.args = {
-  root: createTree(2) as Node,
+  root: createTree(200) as Node,
 };
 
 TidyLayout.play = () => {};
