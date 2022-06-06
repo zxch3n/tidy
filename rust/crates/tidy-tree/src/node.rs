@@ -18,9 +18,9 @@ pub struct TidyData {
     pub extreme_right: Option<NonNull<Node>>,
 
     /// Cached change of x position.
-    pub shift: Coord,
+    pub shift_acceleration: Coord,
     /// Cached change of x position
-    pub change: Coord,
+    pub shift_change: Coord,
 
     /// this.x = parent.x + modifier_to_subtree
     pub modifier_to_subtree: Coord,
@@ -95,6 +95,10 @@ impl Node {
 
     pub fn tidy_mut(&mut self) -> &mut TidyData {
         self.tidy.as_mut().unwrap()
+    }
+
+    pub fn tidy(&self) -> &TidyData {
+        self.tidy.as_ref().unwrap()
     }
 
     pub fn append_child(&mut self, mut child: Self) -> NonNull<Self> {

@@ -133,8 +133,23 @@ impl Node {
         }
     }
 
-    fn set_root(&mut self) {
-        todo!()
+    fn position_root(&mut self) {
+        let first = self.children.first().unwrap();
+        let first_child_pos = first.relative_x + first.tidy().modifier_to_subtree;
+        let last = self.children.last().unwrap();
+        let last_child_pos = last.relative_x + last.tidy().modifier_to_subtree;
+        self.relative_x = (first_child_pos + last_child_pos) / 2.;
+    }
+
+    fn add_child_spacing(&mut self) {
+        let mut speed = 0.;
+        let mut delta = 0.;
+        for child in &mut self.children.iter_mut() {
+            let child = child.tidy_mut();
+            speed += child.shift_acceleration;
+            delta += speed + child.shift_change;
+            child.modifier_to_subtree += delta;
+        }
     }
 }
 
@@ -234,9 +249,10 @@ impl TidyLayout {
         // distribute extra space to nodes between from_index to current_index
         if from_index != current_index - 1 {
             let index_diff = (current_index - from_index) as Coord;
-            node.children[from_index + 1].tidy_mut().shift += distance / index_diff;
-            node.children[current_index].tidy_mut().shift -= distance / index_diff;
-            node.children[current_index].tidy_mut().change -= distance - distance / index_diff;
+            node.children[from_index + 1].tidy_mut().shift_acceleration += distance / index_diff;
+            node.children[current_index].tidy_mut().shift_acceleration -= distance / index_diff;
+            node.children[current_index].tidy_mut().shift_change -=
+                distance - distance / index_diff;
         }
     }
 
@@ -256,8 +272,8 @@ impl TidyLayout {
             node.tidy = Some(Box::new(TidyData {
                 extreme_left: None,
                 extreme_right: None,
-                shift: 0.,
-                change: 0.,
+                shift_acceleration: 0.,
+                shift_change: 0.,
                 modifier_to_subtree: 0.,
                 modifier_extreme_left: 0.,
                 modifier_extreme_right: 0.,
@@ -283,8 +299,18 @@ impl TidyLayout {
             y_list = y_list.update(i, max_y);
         }
 
-        node.set_root();
+        node.position_root();
         node.set_extreme();
+    }
+
+    fn second_walk(&mut self, node: &mut Node, mut mod_sum: Coord) {
+        mod_sum += node.tidy_mut().modifier_to_subtree;
+        node.x = node.relative_x + mod_sum;
+        node.add_child_spacing();
+
+        for child in node.children.iter_mut() {
+            self.second_walk(child, mod_sum);
+        }
     }
 }
 
@@ -292,6 +318,7 @@ impl Layout for TidyLayout {
     fn layout(&mut self, root: &mut Node) {
         self.set_y(root);
         self.first_walk(root);
+        self.second_walk(root, 0.);
     }
 
     fn partial_layout(
