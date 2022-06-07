@@ -18,8 +18,8 @@ function randomId(): number {
 export function createNode(): Node {
   return {
     id: randomId(),
-    height: 10 * Math.random() + 10,
-    width: 10 * Math.random() + 10,
+    height: (10 * Math.random() + 10) | 0,
+    width: (10 * Math.random() + 10) | 0,
     x: 0,
     y: 0,
     children: [],
@@ -28,16 +28,18 @@ export function createNode(): Node {
 
 export function createTree(num: number): Node {
   const root = createNode();
-  const arr = [root];
-  for (let i = 0; i < num; i++) {
-    const child = createNode();
+  let arr = [root];
+  for (let i = 0; i < num; i += 10) {
     const parentIndex = (arr.length * Math.random()) | 0;
-    const parent = arr[parentIndex];
-    parent.children.push(child);
-    child.parentId = parent.id;
-    arr.push(child);
-    if (arr.length > 10) {
-      arr.shift();
+    for (let j = 0; j < 10; j++) {
+      const child = createNode();
+      const parent = arr[parentIndex];
+      parent.children.push(child);
+      child.parentId = parent.id;
+      arr.push(child);
+    }
+    if (arr.length > 200) {
+      arr = arr.slice(100);
     }
   }
 
