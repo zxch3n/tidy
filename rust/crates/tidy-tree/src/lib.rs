@@ -7,7 +7,7 @@ use std::{any::Any, collections::HashMap, ptr::NonNull};
 
 use geometry::Coord;
 use layout::BoundingBox;
-pub use layout::{BasicLayout, Layout};
+pub use layout::{BasicLayout, Layout, TidyLayout};
 pub use node::Node;
 
 pub struct TidyTree {

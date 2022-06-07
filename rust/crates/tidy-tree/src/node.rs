@@ -110,8 +110,8 @@ impl Node {
     }
 
     pub fn intersects(&self, other: &Self) -> bool {
-        self.x < other.x + other.width
-            && self.x + self.width > other.x
+        self.x - self.width / 2. < other.x + other.width / 2.
+            && self.x + self.width / 2. > other.x - other.width / 2.
             && self.y < other.y + other.height
             && self.y + self.height > other.y
     }

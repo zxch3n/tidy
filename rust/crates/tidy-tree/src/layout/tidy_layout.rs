@@ -1,4 +1,4 @@
-use std::ptr::NonNull;
+use std::{ptr::NonNull, thread::panicking};
 
 use crate::{geometry::Coord, node::TidyData, utils::nocheck_mut, Layout, Node};
 
@@ -29,13 +29,13 @@ impl Contour {
         Contour {
             is_left,
             current: Some(current.into()),
-            modifier_sum: current.tidy.as_ref().unwrap().modifier_to_subtree,
+            modifier_sum: 0.,
         }
     }
 
     pub fn left(&self) -> Coord {
         let node = self.node();
-        self.modifier_sum + node.relative_x
+        self.modifier_sum + node.relative_x + node.tidy().modifier_to_subtree
     }
 
     fn node(&self) -> &Node {
@@ -54,7 +54,7 @@ impl Contour {
 
     pub fn right(&self) -> Coord {
         let node = self.node();
-        node.width + self.modifier_sum + node.relative_x
+        node.width + self.modifier_sum + node.relative_x + node.tidy().modifier_to_subtree
     }
 
     pub fn bottom(&self) -> Coord {
@@ -73,17 +73,17 @@ impl Contour {
             self.modifier_sum += node.tidy.as_ref().unwrap().modifier_to_subtree;
             if self.is_left {
                 if node.children.len() > 0 {
-                    self.current = Some((&*node.children[0]).into());
+                    self.current = Some((&**node.children.first().unwrap()).into());
                 } else {
-                    self.modifier_sum += node.tidy.as_ref().unwrap().modifier_thread_left;
-                    self.current = node.tidy.as_ref().unwrap().thread_left;
+                    self.modifier_sum += node.tidy().modifier_thread_left;
+                    self.current = node.tidy().thread_left;
                 }
             } else {
                 if node.children.len() > 0 {
-                    self.current = Some((&*node.children[node.children.len() - 1]).into());
+                    self.current = Some((&**node.children.last().unwrap()).into());
                 } else {
-                    self.modifier_sum += node.tidy.as_ref().unwrap().modifier_thread_right;
-                    self.current = node.tidy.as_ref().unwrap().thread_right;
+                    self.modifier_sum += node.tidy().modifier_thread_right;
+                    self.current = node.tidy().thread_right;
                 }
             }
         }
@@ -92,7 +92,7 @@ impl Contour {
 
 impl Node {
     fn set_extreme(&mut self) {
-        let self_ptr: NonNull<Node> = (self as &Self).into();
+        let self_ptr: NonNull<Node> = self.into();
         let mut tidy = self.tidy.as_mut().unwrap();
         if self.children.len() == 0 {
             tidy.extreme_left = Some(self_ptr);
@@ -161,15 +161,26 @@ impl TidyLayout {
         mut y_list: LinkedYList,
     ) -> LinkedYList {
         // right contour of the left
-        let mut left = Contour::new(false, &node.children[0]);
+        let mut left = Contour::new(false, &node.children[child_index - 1]);
         // left contour of the right
-        let mut right = Contour::new(true, &node.children[node.children.len() - 1]);
+        let mut right = Contour::new(true, &node.children[child_index]);
+        // let mut i = 0;
         while !left.is_none() && !right.is_none() {
-            if left.bottom() > y_list.bottom() {
+            let left_bottom = left.bottom();
+            // println!("{} {}", i, left_bottom);
+            // i += 1;
+            // if (left_bottom - 39.) < 1e-6 {
+            //     println!("{}", i);
+            // }
+
+            if left_bottom > y_list.bottom() {
                 y_list = y_list.pop().unwrap();
             }
 
-            let dist = left.right() - right.left() - self.peer_margin;
+            let dist = left.right() - right.left() + self.peer_margin;
+            if dist > 1e6 {
+                println!("{}", dist);
+            }
             if dist > 0. {
                 // left contour is too wide, so we move it
                 left.modifier_sum += dist;
@@ -181,7 +192,7 @@ impl TidyLayout {
             if left_bottom <= right_bottom {
                 left.next();
             }
-            if right_bottom >= left_bottom {
+            if left_bottom >= right_bottom {
                 right.next();
             }
         }
@@ -244,6 +255,7 @@ impl TidyLayout {
     ) {
         let child = &mut node.children[current_index];
         let mut child_tidy = child.tidy_mut();
+        // debug_assert!(distance <= 1e6);
         child_tidy.modifier_to_subtree += distance;
 
         // distribute extra space to nodes between from_index to current_index
@@ -268,29 +280,34 @@ impl TidyLayout {
     }
 
     fn first_walk(&mut self, node: &mut Node) {
-        if node.tidy.is_none() {
-            node.tidy = Some(Box::new(TidyData {
-                extreme_left: None,
-                extreme_right: None,
-                shift_acceleration: 0.,
-                shift_change: 0.,
-                modifier_to_subtree: 0.,
-                modifier_extreme_left: 0.,
-                modifier_extreme_right: 0.,
-                thread_left: None,
-                thread_right: None,
-                modifier_thread_left: 0.,
-                modifier_thread_right: 0.,
-            }));
-        }
-
         if node.children.len() == 0 {
             node.set_extreme();
             return;
         }
 
         self.first_walk(node.children.first_mut().unwrap());
-        let mut y_list = LinkedYList::new(0, node.children[0].extreme_left().bottom());
+        let mut y_list = LinkedYList::new(0, node.children[0].extreme_right().bottom());
+        // if node.children[0]
+        //     .extreme_right()
+        //     .tidy()
+        //     .thread_right
+        //     .is_some()
+        // {
+        //     println!("HHHHHHHH");
+        //     println!("{:#?}", node.children[0]);
+        //     println!("Extreme right");
+        //     println!("{:#?}", node.children[0].extreme_right());
+        //     println!("RIGHT");
+        //     println!("{:#?}", unsafe {
+        //         node.children[0]
+        //             .extreme_right()
+        //             .tidy()
+        //             .thread_right
+        //             .unwrap()
+        //             .as_ref()
+        //     });
+        //     panic!();
+        // }
         for i in 1..node.children.len() {
             let current_child = node.children.get_mut(i).unwrap();
             self.first_walk(current_child);
@@ -316,6 +333,22 @@ impl TidyLayout {
 
 impl Layout for TidyLayout {
     fn layout(&mut self, root: &mut Node) {
+        println!("START!");
+        root.pre_order_traversal_mut(|node| {
+            node.tidy = Some(Box::new(TidyData {
+                extreme_left: None,
+                extreme_right: None,
+                shift_acceleration: 0.,
+                shift_change: 0.,
+                modifier_to_subtree: 0.,
+                modifier_extreme_left: 0.,
+                modifier_extreme_right: 0.,
+                thread_left: None,
+                thread_right: None,
+                modifier_thread_left: 0.,
+                modifier_thread_right: 0.,
+            }));
+        });
         self.set_y(root);
         self.first_walk(root);
         self.second_walk(root, 0.);
