@@ -5,6 +5,9 @@ import { readFile } from 'fs/promises';
 import * as path from 'path';
 
 describe('tidy', () => {
+  /**
+   * it takes 20ms to layout 100k nodes
+   */
   it('benchmark', async () => {
     const wasm = await readFile(
       path.join(__dirname, '../wasm_dist/wasm_bg.wasm'),
