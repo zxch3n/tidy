@@ -31,7 +31,7 @@ impl Contour {
         Contour {
             is_left,
             current: Some(current.into()),
-            modifier_sum: 0.,
+            modifier_sum: current.tidy().modifier_to_subtree,
         }
     }
 
@@ -52,13 +52,13 @@ impl Contour {
     pub fn left(&self) -> Coord {
         let node = self.node();
         assert_eq!(node.tidy().test, TEST);
-        self.modifier_sum + node.relative_x + node.tidy().modifier_to_subtree - node.width / 2.
+        self.modifier_sum + node.relative_x - node.width / 2.
     }
 
     pub fn right(&self) -> Coord {
         let node = self.node();
         assert_eq!(node.tidy().test, TEST);
-        self.modifier_sum + node.relative_x + node.tidy().modifier_to_subtree + node.width / 2.
+        self.modifier_sum + node.relative_x + node.width / 2.
     }
 
     pub fn bottom(&self) -> Coord {
@@ -74,11 +74,12 @@ impl Contour {
     pub fn next(&mut self) {
         if let Some(mut current) = self.current {
             let node = unsafe { current.as_mut() };
-            self.modifier_sum += node.tidy.as_ref().unwrap().modifier_to_subtree;
             assert_eq!(node.tidy().test, TEST);
             if self.is_left {
                 if node.children.len() > 0 {
                     self.current = Some((&**node.children.first().unwrap()).into());
+                    let node = self.node();
+                    self.modifier_sum += node.tidy.as_ref().unwrap().modifier_to_subtree;
                 } else {
                     self.modifier_sum += node.tidy().modifier_thread_left;
                     self.current = node.tidy().thread_left;
@@ -86,6 +87,8 @@ impl Contour {
             } else {
                 if node.children.len() > 0 {
                     self.current = Some((&**node.children.last().unwrap()).into());
+                    let node = self.node();
+                    self.modifier_sum += node.tidy.as_ref().unwrap().modifier_to_subtree;
                 } else {
                     self.modifier_sum += node.tidy().modifier_thread_right;
                     self.current = node.tidy().thread_right;
@@ -182,10 +185,7 @@ impl TidyLayout {
             let dist = left.right() - right.left() + self.peer_margin;
             if dist > 0. {
                 // left and right are too close. move right part with distance of dist
-                let ptr: *const _ = &*node.children[child_index];
-                if ptr != &*right.node() {
-                    right.modifier_sum += dist;
-                }
+                right.modifier_sum += dist;
                 self.move_subtree(node, child_index, y_list.index, dist);
             }
 
