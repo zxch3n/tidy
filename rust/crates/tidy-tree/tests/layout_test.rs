@@ -6,7 +6,7 @@ use tidy_tree::{geometry::Coord, BasicLayout, Layout, Node, TidyLayout};
 
 pub fn test_layout(layout: &mut dyn Layout) {
     let mut rng = StdRng::seed_from_u64(1001);
-    for _ in 0..1 {
+    for _ in 0..100 {
         let mut tree = gen_tree(&mut rng, 200);
         layout.layout(&mut tree);
         // aesthetic_rules::assert_symmetric(&tree, layout);
@@ -61,4 +61,30 @@ fn test_basic_layout() {
 fn test_tidy_layout() {
     let mut layout = TidyLayout::new(10., 10.);
     test_layout(&mut layout);
+}
+
+#[test]
+fn test_tidy_layout2() {
+    let mut tidy = TidyLayout::new(1., 1.);
+    let mut root = Node::new(0, 1., 1.);
+    let first_child = Node::new_with_child(
+        1,
+        1.,
+        1.,
+        Node::new_with_child(10, 2., 1., Node::new(100, 1., 1.)),
+    );
+    root.append_child(first_child);
+
+    let second = Node::new_with_child(
+        2,
+        1.,
+        1.,
+        Node::new_with_child(11, 1., 1., Node::new(101, 1., 1.)),
+    );
+    root.append_child(second);
+
+    root.append_child(Node::new(3, 1., 2.));
+    tidy.layout(&mut root);
+    // println!("{}", root.str());
+    aesthetic_rules::assert_symmetric(&root, &mut tidy);
 }

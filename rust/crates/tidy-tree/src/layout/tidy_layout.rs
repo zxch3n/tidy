@@ -52,13 +52,13 @@ impl Contour {
     pub fn left(&self) -> Coord {
         let node = self.node();
         assert_eq!(node.tidy().test, TEST);
-        self.modifier_sum + node.relative_x + node.tidy().modifier_to_subtree
+        self.modifier_sum + node.relative_x + node.tidy().modifier_to_subtree - node.width / 2.
     }
 
     pub fn right(&self) -> Coord {
         let node = self.node();
         assert_eq!(node.tidy().test, TEST);
-        node.width + self.modifier_sum + node.relative_x + node.tidy().modifier_to_subtree
+        self.modifier_sum + node.relative_x + node.tidy().modifier_to_subtree + node.width / 2.
     }
 
     pub fn bottom(&self) -> Coord {
@@ -335,7 +335,6 @@ impl TidyLayout {
 
 impl Layout for TidyLayout {
     fn layout(&mut self, root: &mut Node) {
-        println!("START!");
         root.pre_order_traversal_mut(|node| {
             node.tidy = Some(Box::new(TidyData {
                 extreme_left: None,

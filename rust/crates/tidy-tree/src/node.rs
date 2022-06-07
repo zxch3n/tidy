@@ -102,9 +102,21 @@ impl Node {
         self.tidy.as_ref().unwrap()
     }
 
+    fn reset_parent_link(&mut self) {
+        if self.children.len() == 0 {
+            return;
+        }
+
+        let ptr = self.into();
+        for child in self.children.iter_mut() {
+            child.parent = Some(ptr);
+        }
+    }
+
     pub fn append_child(&mut self, mut child: Self) -> NonNull<Self> {
         child.parent = Some(self.into());
-        let boxed = Box::new(child);
+        let mut boxed = Box::new(child);
+        boxed.reset_parent_link();
         let ptr = boxed.as_ref().into();
         self.children.push(boxed);
         ptr

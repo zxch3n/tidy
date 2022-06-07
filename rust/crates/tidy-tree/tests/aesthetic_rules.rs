@@ -88,8 +88,8 @@ pub fn assert_symmetric(root: &Node, layout: &mut dyn Layout) {
     pre_order_traversal_rev(&mirrored, |node| {
         point_mirrored.push(node.x);
     });
-    // println!("{:#?}", root);
-    // println!("{:#?}", mirrored);
+    println!("{}", root.str());
+    println!("{}", mirrored.str());
 
     assert_eq!(point_origin.len(), point_mirrored.len());
     for i in 0..point_origin.len() {
