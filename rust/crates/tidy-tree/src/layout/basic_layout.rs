@@ -35,6 +35,13 @@ impl Default for BoundingBox {
 
 impl Layout for BasicLayout {
     fn layout(&mut self, root: &mut Node) {
+        root.pre_order_traversal_mut(|node| {
+            node.tidy = None;
+            node.x = 0.;
+            node.y = 0.;
+            node.relative_x = 0.;
+            node.relative_y = 0.;
+        });
         root.post_order_traversal_mut(|node| {
             self.update_meta(node);
         });

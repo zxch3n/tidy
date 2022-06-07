@@ -1,24 +1,28 @@
 import React, { useCallback, useState } from 'react';
-import { LayoutType, Node } from '../tidy';
-import { TidyComponent } from '../TidyComponent';
-import { produce } from 'immer';
-import { ComponentStory, ComponentMeta } from '@storybook/react';
+import { Node } from '../tidy';
+import { LayoutTypeStr, TidyComponent } from '../TidyComponent';
 import { createNode, createTree, visit } from '../utils';
 
 export default {
   title: 'Tidy',
   component: TidyComponent,
-} as ComponentMeta<typeof TidyComponent>;
+  argTypes: {
+    layoutType: {
+      options: [LayoutTypeStr.Tidy, LayoutTypeStr.Basic],
+      defaultValue: LayoutTypeStr.Basic,
+    },
+  },
+};
 
 interface Props {
-  layoutType?: LayoutType;
-  root: Node;
+  layoutType: LayoutTypeStr;
 }
 
+const root = createTree(200) as Node;
 /**
  * Primary UI component for user interaction
  */
-export const TidyLayout = ({ root, layoutType, ...props }: Props) => {
+export const TidyLayout = ({ layoutType, ...props }: Props) => {
   const [updateTrigger, setUpdate] = useState(0);
   const addNode = useCallback(() => {
     let nodes: [Node, number][] = [];
@@ -50,9 +54,3 @@ export const TidyLayout = ({ root, layoutType, ...props }: Props) => {
     </div>
   );
 };
-
-TidyLayout.args = {
-  root: createTree(200) as Node,
-};
-
-TidyLayout.play = () => {};

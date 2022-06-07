@@ -1,9 +1,15 @@
 extern crate wasm_bindgen;
-use tidy_tree::{geometry::Coord, TidyTree, NULL_ID};
+use tidy_tree::{geometry::Coord, LayoutType, TidyTree, NULL_ID};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub struct Tidy(TidyTree);
+
+#[wasm_bindgen]
+pub enum WasmLayoutType {
+    Basic,
+    Tidy,
+}
 
 #[wasm_bindgen]
 impl Tidy {
@@ -13,6 +19,17 @@ impl Tidy {
 
     pub fn with_basic_layout() -> Self {
         Tidy(TidyTree::with_basic_layout())
+    }
+
+    pub fn with_tidy_layout() -> Self {
+        Tidy(TidyTree::with_tidy_layout())
+    }
+
+    pub fn change_layout(&mut self, layout_type: WasmLayoutType) {
+        match layout_type {
+            WasmLayoutType::Basic => self.0.change_layout(LayoutType::Basic),
+            WasmLayoutType::Tidy => self.0.change_layout(LayoutType::Tidy),
+        }
     }
 
     pub fn is_empty(&self) -> bool {

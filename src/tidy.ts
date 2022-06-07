@@ -3,13 +3,12 @@ import _initWasm, {
   InitOutput,
   Tidy,
   Tidy as TidyWasm,
+  WasmLayoutType as LayoutType,
 } from '../wasm_dist/wasm';
 import { Disposable } from './dispose';
 import { visit } from './utils';
 
-export enum LayoutType {
-  Basic = 'basic',
-}
+export { LayoutType };
 
 let promise: Promise<InitOutput> | undefined;
 
@@ -65,6 +64,8 @@ export class TidyLayout extends Disposable {
     super();
     if (type === LayoutType.Basic) {
       this.tidy = TidyWasm.with_basic_layout();
+    } else if (type === LayoutType.Tidy) {
+      this.tidy = TidyWasm.with_tidy_layout();
     } else {
       throw new Error('not implemented');
     }
@@ -73,6 +74,10 @@ export class TidyLayout extends Disposable {
         this.tidy.free();
       },
     });
+  }
+
+  changeLayoutType(type: LayoutType) {
+    this.tidy.change_layout(type);
   }
 
   layout(updated = false) {

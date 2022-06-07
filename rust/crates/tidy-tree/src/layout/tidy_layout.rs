@@ -332,6 +332,10 @@ impl Layout for TidyLayout {
                 modifier_thread_right: 0.,
                 test: TEST,
             }));
+            node.x = 0.;
+            node.y = 0.;
+            node.relative_x = 0.;
+            node.relative_y = 0.;
         });
         self.set_y(root);
         self.first_walk(root);
