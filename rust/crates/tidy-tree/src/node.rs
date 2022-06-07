@@ -128,6 +128,14 @@ impl Node {
         node
     }
 
+    pub fn new_with_children(id: usize, width: Coord, height: Coord, children: Vec<Self>) -> Self {
+        let mut node = Node::new(id, width, height);
+        for child in children {
+            node.append_child(child);
+        }
+        node
+    }
+
     pub fn intersects(&self, other: &Self) -> bool {
         self.x - self.width / 2. < other.x + other.width / 2.
             && self.x + self.width / 2. > other.x - other.width / 2.

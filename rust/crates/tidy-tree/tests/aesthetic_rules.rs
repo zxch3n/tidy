@@ -50,7 +50,7 @@ pub fn assert_no_crossed_lines(root: &Node) {
             let line = Line {
                 from: Point {
                     x: node.x,
-                    y: node.y,
+                    y: node.y + node.height,
                 },
                 to: Point {
                     x: child.x,
@@ -88,17 +88,14 @@ pub fn assert_symmetric(root: &Node, layout: &mut dyn Layout) {
     pre_order_traversal_rev(&mirrored, |node| {
         point_mirrored.push(node.x);
     });
-    println!("{}", root.str());
-    println!("{}", mirrored.str());
 
     assert_eq!(point_origin.len(), point_mirrored.len());
     for i in 0..point_origin.len() {
-        assert!(
-            (point_origin[i] + point_mirrored[i]).abs() <= 1e-6,
-            "{} != {}",
-            point_origin[i],
-            -point_mirrored[i]
-        )
+        if (point_origin[i] + point_mirrored[i]).abs() > 1e-6 {
+            println!("{}", root.str());
+            println!("{}", mirrored.str());
+            panic!("{} != {}", point_origin[i], point_mirrored[i]);
+        }
     }
 
     fn pre_order_traversal_rev<F>(node: &Node, mut f: F)
@@ -119,6 +116,10 @@ pub fn assert_symmetric(root: &Node, layout: &mut dyn Layout) {
 fn mirror(root: &Node) -> Node {
     let mut root = root.clone();
     root.post_order_traversal_mut(|node| {
+        node.x = 0.;
+        node.y = 0.;
+        node.relative_x = 0.;
+        node.relative_y = 0.;
         let n = node.children.len();
         for i in 0..n / 2 {
             node.children.swap(i, n - i - 1);

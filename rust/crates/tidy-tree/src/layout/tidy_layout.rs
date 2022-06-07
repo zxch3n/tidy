@@ -151,6 +151,9 @@ impl Node {
         let last = self.children.last().unwrap();
         let last_child_pos = last.relative_x + last.tidy().modifier_to_subtree;
         self.relative_x = (first_child_pos + last_child_pos) / 2.;
+        // make modifier_to_subtree + relative_x = 0. so that
+        // there will always be collision in `separation()`'s first loop
+        self.tidy_mut().modifier_to_subtree = -self.relative_x;
     }
 
     fn add_child_spacing(&mut self) {
@@ -289,27 +292,6 @@ impl TidyLayout {
 
         self.first_walk(node.children.first_mut().unwrap());
         let mut y_list = LinkedYList::new(0, node.children[0].extreme_right().bottom());
-        // if node.children[0]
-        //     .extreme_right()
-        //     .tidy()
-        //     .thread_right
-        //     .is_some()
-        // {
-        //     println!("HHHHHHHH");
-        //     println!("{:#?}", node.children[0]);
-        //     println!("Extreme right");
-        //     println!("{:#?}", node.children[0].extreme_right());
-        //     println!("RIGHT");
-        //     println!("{:#?}", unsafe {
-        //         node.children[0]
-        //             .extreme_right()
-        //             .tidy()
-        //             .thread_right
-        //             .unwrap()
-        //             .as_ref()
-        //     });
-        //     panic!();
-        // }
         for i in 1..node.children.len() {
             let current_child = node.children.get_mut(i).unwrap();
             self.first_walk(current_child);
@@ -353,7 +335,7 @@ impl Layout for TidyLayout {
         });
         self.set_y(root);
         self.first_walk(root);
-        self.second_walk(root, -root.relative_x);
+        self.second_walk(root, 0.);
     }
 
     fn partial_layout(
