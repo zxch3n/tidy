@@ -21,6 +21,7 @@ pub struct TidyData {
     pub shift_acceleration: Coord,
     /// Cached change of x position
     pub shift_change: Coord,
+    pub test: usize,
 
     /// this.x = parent.x + modifier_to_subtree
     pub modifier_to_subtree: Coord,
@@ -109,6 +110,12 @@ impl Node {
         ptr
     }
 
+    pub fn new_with_child(id: usize, width: Coord, height: Coord, child: Self) -> Self {
+        let mut node = Node::new(id, width, height);
+        node.append_child(child);
+        node
+    }
+
     pub fn intersects(&self, other: &Self) -> bool {
         self.x - self.width / 2. < other.x + other.width / 2.
             && self.x + self.width / 2. > other.x - other.width / 2.
@@ -180,5 +187,36 @@ impl Node {
                 stack.push(child.as_ref().into());
             }
         }
+    }
+
+    pub fn str(&self) -> String {
+        let mut s = String::new();
+        if self.tidy.is_some() {
+            s.push_str(&format!(
+                "x: {}, y: {}, width: {}, height: {}, rx: {}, mod: {}\n",
+                self.x,
+                self.y,
+                self.width,
+                self.height,
+                self.relative_x,
+                self.tidy().modifier_to_subtree
+            ));
+        } else {
+            s.push_str(&format!(
+                "x: {}, y: {}, width: {}, height: {}, rx: {}\n",
+                self.x, self.y, self.width, self.height, self.relative_x,
+            ));
+        }
+        for child in self.children.iter() {
+            for line in child.str().split("\n") {
+                if line.len() == 0 {
+                    continue;
+                }
+
+                s.push_str(&format!("    {}\n", line));
+            }
+        }
+
+        s
     }
 }

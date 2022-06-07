@@ -9,6 +9,8 @@ pub struct TidyLayout {
     pub peer_margin: Coord,
 }
 
+const TEST: usize = 123123231;
+
 impl TidyLayout {
     pub fn new(parent_child_margin: Coord, peer_margin: Coord) -> Self {
         TidyLayout {
@@ -20,7 +22,7 @@ impl TidyLayout {
 
 struct Contour {
     is_left: bool,
-    current: Option<NonNull<Node>>,
+    pub current: Option<NonNull<Node>>,
     modifier_sum: Coord,
 }
 
@@ -31,11 +33,6 @@ impl Contour {
             current: Some(current.into()),
             modifier_sum: 0.,
         }
-    }
-
-    pub fn left(&self) -> Coord {
-        let node = self.node();
-        self.modifier_sum + node.relative_x + node.tidy().modifier_to_subtree
     }
 
     fn node(&self) -> &Node {
@@ -52,8 +49,15 @@ impl Contour {
         self.current.is_none()
     }
 
+    pub fn left(&self) -> Coord {
+        let node = self.node();
+        assert_eq!(node.tidy().test, TEST);
+        self.modifier_sum + node.relative_x + node.tidy().modifier_to_subtree
+    }
+
     pub fn right(&self) -> Coord {
         let node = self.node();
+        assert_eq!(node.tidy().test, TEST);
         node.width + self.modifier_sum + node.relative_x + node.tidy().modifier_to_subtree
     }
 
@@ -71,6 +75,7 @@ impl Contour {
         if let Some(mut current) = self.current {
             let node = unsafe { current.as_mut() };
             self.modifier_sum += node.tidy.as_ref().unwrap().modifier_to_subtree;
+            assert_eq!(node.tidy().test, TEST);
             if self.is_left {
                 if node.children.len() > 0 {
                     self.current = Some((&**node.children.first().unwrap()).into());
@@ -85,6 +90,10 @@ impl Contour {
                     self.modifier_sum += node.tidy().modifier_thread_right;
                     self.current = node.tidy().thread_right;
                 }
+            }
+            if self.current.is_some() {
+                let node = self.node();
+                assert_eq!(node.tidy().test, TEST);
             }
         }
     }
@@ -166,24 +175,17 @@ impl TidyLayout {
         let mut right = Contour::new(true, &node.children[child_index]);
         // let mut i = 0;
         while !left.is_none() && !right.is_none() {
-            let left_bottom = left.bottom();
-            // println!("{} {}", i, left_bottom);
-            // i += 1;
-            // if (left_bottom - 39.) < 1e-6 {
-            //     println!("{}", i);
-            // }
-
-            if left_bottom > y_list.bottom() {
+            if left.bottom() > y_list.bottom() {
                 y_list = y_list.pop().unwrap();
             }
 
             let dist = left.right() - right.left() + self.peer_margin;
-            if dist > 1e6 {
-                println!("{}", dist);
-            }
             if dist > 0. {
-                // left contour is too wide, so we move it
-                left.modifier_sum += dist;
+                // left and right are too close. move right part with distance of dist
+                let ptr: *const _ = &*node.children[child_index];
+                if ptr != &*right.node() {
+                    right.modifier_sum += dist;
+                }
                 self.move_subtree(node, child_index, y_list.index, dist);
             }
 
@@ -347,11 +349,12 @@ impl Layout for TidyLayout {
                 thread_right: None,
                 modifier_thread_left: 0.,
                 modifier_thread_right: 0.,
+                test: TEST,
             }));
         });
         self.set_y(root);
         self.first_walk(root);
-        self.second_walk(root, 0.);
+        self.second_walk(root, -root.relative_x);
     }
 
     fn partial_layout(
@@ -360,5 +363,35 @@ impl Layout for TidyLayout {
         changed: &[std::ptr::NonNull<crate::Node>],
     ) {
         todo!()
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::node::Node;
+    #[test]
+    fn test_tidy_layout() {
+        let mut tidy = TidyLayout::new(1., 1.);
+        let mut root = Node::new(0, 1., 1.);
+        let first_child = Node::new_with_child(
+            1,
+            1.,
+            1.,
+            Node::new_with_child(10, 1., 1., Node::new(100, 1., 1.)),
+        );
+        root.append_child(first_child);
+
+        let second = Node::new_with_child(
+            2,
+            1.,
+            1.,
+            Node::new_with_child(11, 1., 1., Node::new(101, 1., 1.)),
+        );
+        root.append_child(second);
+
+        root.append_child(Node::new(3, 1., 2.));
+        tidy.layout(&mut root);
+        println!("{}", root.str());
     }
 }

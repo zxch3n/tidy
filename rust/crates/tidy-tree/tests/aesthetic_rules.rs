@@ -8,7 +8,7 @@ pub fn assert_no_overlap_nodes(root: &Node) {
         for other in nodes.iter() {
             let other = unsafe { other.as_ref() };
             if node.intersects(other) {
-                let msg = format!("{:#?} and {:#?} overlap", node, other);
+                let msg = format!("{} and {} overlap", node.str(), other.str());
                 panic!("{}", msg);
             }
         }

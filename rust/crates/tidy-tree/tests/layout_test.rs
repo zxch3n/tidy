@@ -5,18 +5,17 @@ use rand::prelude::*;
 use tidy_tree::{geometry::Coord, BasicLayout, Layout, Node, TidyLayout};
 
 pub fn test_layout(layout: &mut dyn Layout) {
-    let mut rng = StdRng::seed_from_u64(101);
-    // for _ in 0..1 {
-    let mut tree = gen_tree(&mut rng, 20);
-    layout.layout(&mut tree);
-    aesthetic_rules::assert_no_overlap_nodes(&tree);
-    aesthetic_rules::assert_no_crossed_lines(&tree);
-    // aesthetic_rules::assert_symmetric(&tree, layout);
-    aesthetic_rules::check_nodes_order(&tree);
-    aesthetic_rules::check_y_position_in_same_level(&tree);
-    aesthetic_rules::assert_parent_centered(&tree);
-    // }
-    println!("{:#?}", tree);
+    let mut rng = StdRng::seed_from_u64(1001);
+    for _ in 0..1 {
+        let mut tree = gen_tree(&mut rng, 200);
+        layout.layout(&mut tree);
+        // aesthetic_rules::assert_symmetric(&tree, layout);
+        aesthetic_rules::assert_no_overlap_nodes(&tree);
+        aesthetic_rules::assert_no_crossed_lines(&tree);
+        aesthetic_rules::check_nodes_order(&tree);
+        aesthetic_rules::check_y_position_in_same_level(&tree);
+        aesthetic_rules::assert_parent_centered(&tree);
+    }
 }
 
 pub fn gen_tree(rng: &mut StdRng, num: usize) -> Node {
