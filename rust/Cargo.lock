@@ -199,6 +199,16 @@ version = "0.1.0"
 dependencies = [
  "num",
  "rand",
+ "tinyset",
+]
+
+[[package]]
+name = "tinyset"
+version = "0.4.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3ac7204fa796fec5da8e86bfd23ed2ae097de4e5ba40d63e4a9afc624c42878c"
+dependencies = [
+ "rand",
 ]
 
 [[package]]

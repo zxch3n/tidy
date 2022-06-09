@@ -1,4 +1,6 @@
-use std::{ptr::NonNull, thread::panicking};
+use std::{collections::HashSet, hash::BuildHasher, ptr::NonNull, thread::panicking};
+
+use tinyset::SetUsize;
 
 use crate::{geometry::Coord, node::TidyData, utils::nocheck_mut, Layout, Node};
 
@@ -164,6 +166,8 @@ impl Node {
             speed += child.shift_acceleration;
             delta += speed + child.shift_change;
             child.modifier_to_subtree += delta;
+            child.shift_acceleration = 0.;
+            child.shift_change = 0.;
         }
     }
 }
@@ -273,15 +277,19 @@ impl TidyLayout {
         }
     }
 
-    fn set_y(&self, root: &mut Node) {
+    fn set_y_recursive(&self, root: &mut Node) {
         root.pre_order_traversal_mut(|node| {
-            node.y = if let Some(parent) = node.parent {
-                let parent_bottom = unsafe { parent.as_ref().bottom() };
-                parent_bottom + self.parent_child_margin
-            } else {
-                0.
-            };
+            self.set_y(node);
         });
+    }
+
+    fn set_y(&self, node: &mut Node) {
+        node.y = if let Some(parent) = node.parent {
+            let parent_bottom = unsafe { parent.as_ref().bottom() };
+            parent_bottom + self.parent_child_margin
+        } else {
+            0.
+        };
     }
 
     fn first_walk(&mut self, node: &mut Node) {
@@ -304,9 +312,51 @@ impl TidyLayout {
         node.set_extreme();
     }
 
+    fn first_walk_with_filter(&mut self, node: &mut Node, set: &SetUsize) {
+        if !set.contains(node as *const _ as usize) {
+            node.set_extreme();
+            invalidate_extreme_thread(node);
+            return;
+        }
+
+        invalidate_extreme_thread(node);
+        if node.children.len() == 0 {
+            node.set_extreme();
+            return;
+        }
+
+        self.first_walk_with_filter(node.children.first_mut().unwrap(), set);
+        let mut y_list = LinkedYList::new(0, node.children[0].extreme_right().bottom());
+        for i in 1..node.children.len() {
+            let current_child = node.children.get_mut(i).unwrap();
+            self.first_walk_with_filter(current_child, set);
+            let max_y = current_child.extreme_left().bottom();
+            y_list = self.separate(node, i, y_list);
+            y_list = y_list.update(i, max_y);
+        }
+
+        node.position_root();
+        node.set_extreme();
+    }
+
     fn second_walk(&mut self, node: &mut Node, mut mod_sum: Coord) {
         mod_sum += node.tidy_mut().modifier_to_subtree;
         node.x = node.relative_x + mod_sum;
+        node.add_child_spacing();
+
+        for child in node.children.iter_mut() {
+            self.second_walk(child, mod_sum);
+        }
+    }
+
+    fn second_walk_with_filter(&mut self, node: &mut Node, mut mod_sum: Coord, set: &SetUsize) {
+        mod_sum += node.tidy_mut().modifier_to_subtree;
+        let new_x = node.relative_x + mod_sum;
+        if !set.contains(node as *const _ as usize) {
+            return;
+        }
+
+        node.x = new_x;
         node.add_child_spacing();
 
         for child in node.children.iter_mut() {
@@ -317,27 +367,8 @@ impl TidyLayout {
 
 impl Layout for TidyLayout {
     fn layout(&mut self, root: &mut Node) {
-        root.pre_order_traversal_mut(|node| {
-            node.tidy = Some(Box::new(TidyData {
-                extreme_left: None,
-                extreme_right: None,
-                shift_acceleration: 0.,
-                shift_change: 0.,
-                modifier_to_subtree: 0.,
-                modifier_extreme_left: 0.,
-                modifier_extreme_right: 0.,
-                thread_left: None,
-                thread_right: None,
-                modifier_thread_left: 0.,
-                modifier_thread_right: 0.,
-                test: TEST,
-            }));
-            node.x = 0.;
-            node.y = 0.;
-            node.relative_x = 0.;
-            node.relative_y = 0.;
-        });
-        self.set_y(root);
+        root.pre_order_traversal_mut(|node| init_node(node));
+        self.set_y_recursive(root);
         self.first_walk(root);
         self.second_walk(root, 0.);
     }
@@ -347,8 +378,68 @@ impl Layout for TidyLayout {
         root: &mut crate::Node,
         changed: &[std::ptr::NonNull<crate::Node>],
     ) {
-        todo!()
+        for node in changed.iter() {
+            let node = unsafe { &mut *node.as_ptr() };
+            if node.tidy.is_none() {
+                init_node(node);
+            }
+        }
+
+        // TODO: optimize
+        self.set_y_recursive(root);
+        let mut set: SetUsize = SetUsize::new();
+        for node in changed.iter() {
+            set.insert(node.as_ptr() as usize);
+            let mut node = unsafe { &mut *node.as_ptr() };
+            while node.parent.is_some() {
+                set.insert(node.parent.unwrap().as_ptr() as usize);
+                node = node.parent();
+            }
+        }
+
+        self.first_walk_with_filter(root, &set);
+        // TODO: optimize
+        // self.second_walk_with_filter(root, 0., &set);
+        self.second_walk(root, 0.);
     }
+}
+
+fn init_node(node: &mut Node) {
+    node.tidy = Some(Box::new(TidyData {
+        extreme_left: None,
+        extreme_right: None,
+        shift_acceleration: 0.,
+        shift_change: 0.,
+        modifier_to_subtree: 0.,
+        modifier_extreme_left: 0.,
+        modifier_extreme_right: 0.,
+        thread_left: None,
+        thread_right: None,
+        modifier_thread_left: 0.,
+        modifier_thread_right: 0.,
+        test: TEST,
+    }));
+    node.x = 0.;
+    node.y = 0.;
+    node.relative_x = 0.;
+    node.relative_y = 0.;
+}
+
+fn invalidate_extreme_thread(node: &mut Node) {
+    if node.tidy().extreme_left.is_none() {
+        node.set_extreme();
+    }
+
+    let mut e_left = node.extreme_left().tidy_mut();
+    e_left.thread_left = None;
+    e_left.thread_right = None;
+    e_left.modifier_thread_left = 0.;
+    e_left.modifier_thread_right = 0.;
+    let mut e_right = node.extreme_right().tidy_mut();
+    e_right.thread_left = None;
+    e_right.thread_right = None;
+    e_right.modifier_thread_left = 0.;
+    e_right.modifier_thread_right = 0.;
 }
 
 #[cfg(test)]

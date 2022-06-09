@@ -35,7 +35,7 @@ pub fn check_y_position_in_same_level(root: &Node) {
         let mut prev = None;
         for child in node.children.iter() {
             if let Some(prev) = prev {
-                assert!(prev == child.y);
+                assert_eq!(prev, child.y);
             }
 
             prev = Some(child.y);
@@ -123,11 +123,6 @@ fn mirror(root: &Node) -> Node {
         let n = node.children.len();
         for i in 0..n / 2 {
             node.children.swap(i, n - i - 1);
-        }
-
-        let node_ptr = node.into();
-        for child in node.children.iter_mut() {
-            child.parent = Some(node_ptr);
         }
     });
     root

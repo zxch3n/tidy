@@ -2,7 +2,7 @@ use std::ptr::NonNull;
 
 use crate::{geometry::Coord, layout::BoundingBox};
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct TidyData {
     pub thread_left: Option<NonNull<Node>>,
     pub thread_right: Option<NonNull<Node>>,
@@ -35,7 +35,7 @@ pub struct TidyData {
     pub modifier_extreme_right: Coord,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Node {
     pub id: usize,
     pub width: Coord,
@@ -51,6 +51,35 @@ pub struct Node {
     /// Children need boxing to get a stable addr in the heap
     pub children: Vec<Box<Node>>,
     pub tidy: Option<Box<TidyData>>,
+}
+
+impl Clone for Node {
+    fn clone(&self) -> Self {
+        let mut root = Self {
+            id: self.id.clone(),
+            width: self.width.clone(),
+            height: self.height.clone(),
+            x: self.x.clone(),
+            y: self.y.clone(),
+            relative_x: self.relative_x.clone(),
+            relative_y: self.relative_y.clone(),
+            bbox: self.bbox.clone(),
+            parent: None,
+            children: self.children.clone(),
+            tidy: None,
+        };
+
+        if self.parent.is_none() {
+            root.post_order_traversal_mut(|node| {
+                let node_ptr = node.into();
+                for child in node.children.iter_mut() {
+                    child.parent = Some(node_ptr);
+                }
+            });
+        }
+
+        root
+    }
 }
 
 impl Default for Node {
@@ -87,9 +116,11 @@ impl Node {
             tidy: None,
         }
     }
-}
 
-impl Node {
+    pub fn parent(&mut self) -> &mut Self {
+        unsafe { self.parent.unwrap().as_mut() }
+    }
+
     pub fn bottom(&self) -> Coord {
         self.height + self.y
     }

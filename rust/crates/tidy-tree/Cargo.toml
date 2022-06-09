@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 num = "0.4.0"
+tinyset = "0.4.10"
 
 [dev-dependencies]
 rand = "0.8.5"
