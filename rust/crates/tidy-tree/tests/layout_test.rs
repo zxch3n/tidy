@@ -1,4 +1,4 @@
-use std::{collections::HashSet, panic::catch_unwind, ptr::NonNull};
+use std::{panic::catch_unwind, ptr::NonNull};
 
 mod aesthetic_rules;
 use rand::prelude::*;
