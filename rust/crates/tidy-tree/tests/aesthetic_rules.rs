@@ -9,7 +9,7 @@ pub fn assert_no_overlap_nodes(root: &Node) {
             let other = unsafe { other.as_ref() };
             if node.intersects(other) {
                 let msg = format!("{} and {} overlap", node.str(), other.str());
-                panic!("{}", msg);
+                panic!("{}\n\n{}", msg, root.str());
             }
         }
 
@@ -68,12 +68,6 @@ pub fn assert_no_crossed_lines(root: &Node) {
 
             lines.push(line);
         }
-    });
-}
-
-pub fn assert_parent_centered(root: &Node) {
-    root.pre_order_traversal(|node| {
-        assert!((node.bbox.shift_x + node.bbox.total_width / 2.).abs() < 1e-6);
     });
 }
 

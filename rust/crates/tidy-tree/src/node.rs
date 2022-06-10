@@ -255,8 +255,8 @@ impl Node {
             ));
         } else {
             s.push_str(&format!(
-                "x: {}, y: {}, width: {}, height: {}, rx: {}\n",
-                self.x, self.y, self.width, self.height, self.relative_x,
+                "x: {}, y: {}, width: {}, height: {}, rx: {}, id: {}\n",
+                self.x, self.y, self.width, self.height, self.relative_x, self.id
             ));
         }
         for child in self.children.iter() {
