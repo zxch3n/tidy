@@ -183,7 +183,6 @@ impl TidyLayout {
         let mut left = Contour::new(false, &node.children[child_index - 1]);
         // left contour of the right
         let mut right = Contour::new(true, &node.children[child_index]);
-        // let mut i = 0;
         while !left.is_none() && !right.is_none() {
             if left.bottom() > y_list.bottom() {
                 y_list = y_list.pop().unwrap();
@@ -327,6 +326,7 @@ impl TidyLayout {
         let mut y_list = LinkedYList::new(0, node.children[0].extreme_right().bottom());
         for i in 1..node.children.len() {
             let current_child = node.children.get_mut(i).unwrap();
+            current_child.tidy_mut().modifier_to_subtree = -current_child.relative_x;
             self.first_walk_with_filter(current_child, set);
             let max_y = current_child.extreme_left().bottom();
             y_list = self.separate(node, i, y_list);

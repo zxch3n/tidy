@@ -9,6 +9,10 @@ pub fn test_layout(layout: &mut dyn Layout) {
     for _ in 0..100 {
         let mut tree = gen_tree(&mut rng, 500);
         layout.layout(&mut tree);
+        // let first: Vec<Coord> = tree.iter().map(|node| node.x).collect();
+        // layout.layout(&mut tree);
+        // let second: Vec<Coord> = tree.iter().map(|node| node.x).collect();
+        // assert_eq!(first, second);
         aesthetic_rules::assert_no_overlap_nodes(&tree);
         aesthetic_rules::assert_no_crossed_lines(&tree);
         aesthetic_rules::check_nodes_order(&tree);
@@ -48,6 +52,41 @@ pub fn test_partial_layout(layout: &mut dyn Layout) {
     }
 }
 
+pub fn align_partial_layout_with_full_layout(layout: &mut dyn Layout) {
+    let mut rng = StdRng::seed_from_u64(1001);
+    for _ in 0..100 {
+        let mut tree = gen_tree(&mut rng, 10);
+        layout.layout(&mut tree);
+        let mut nodes: Vec<NonNull<Node>> = vec![];
+        tree.pre_order_traversal(|node| nodes.push(node.into()));
+        for times in 0..100 {
+            let new_node = insert_random_node(&mut rng, &nodes);
+            let changed_node = change_random_node(&mut rng, &nodes);
+            layout.partial_layout(&mut tree, &[new_node, changed_node]);
+            let partial_str = tree.str();
+            let partial_x: Vec<Coord> = tree.iter().map(|node| node.x).collect();
+            aesthetic_rules::assert_no_overlap_nodes(&tree);
+            aesthetic_rules::assert_no_crossed_lines(&tree);
+            aesthetic_rules::check_nodes_order(&tree);
+            aesthetic_rules::check_y_position_in_same_level(&tree);
+            aesthetic_rules::assert_parent_centered(&tree);
+            layout.layout(&mut tree);
+            let full_x: Vec<Coord> = tree.iter().map(|node| node.x).collect();
+            for i in 0..partial_x.len() {
+                if (full_x[i] - partial_x[i]).abs() > 10. {
+                    println!("NEW_NODE: {}", unsafe { new_node.as_ref().str() });
+                    println!("{} != {}", full_x[i], partial_x[i]);
+                    panic!("partial layout result does not equal full layout result. Times: {}.\nfull: {:?}\npartial: {:?}\n\nFULL\n{}\n\nPARTIAL\n{}",
+                        times,
+                        &full_x, &partial_x,
+                        tree.str(), partial_str
+                    );
+                }
+            }
+        }
+    }
+}
+
 fn change_random_node(rng: &mut StdRng, nodes: &[NonNull<Node>]) -> NonNull<Node> {
     let node_index = rng.gen_range(0..nodes.len()) as usize;
     let node = unsafe { &mut *nodes[node_index].as_ptr() };
@@ -80,8 +119,8 @@ pub fn gen_tree(rng: &mut StdRng, num: usize) -> Node {
 fn gen_node(rng: &mut StdRng) -> Node {
     Node {
         id: rng.gen(),
-        width: rng.gen_range(1..10) as Coord,
-        height: rng.gen_range(1..10) as Coord,
+        width: rng.gen_range(5..50) as Coord,
+        height: rng.gen_range(5..50) as Coord,
         x: 0.,
         y: 0.,
         relative_x: 0.,
@@ -165,6 +204,7 @@ mod test {
     #[test]
     fn test_tidy_partial_layout() {
         let mut layout = TidyLayout::new(10., 10.);
-        test_partial_layout(&mut layout);
+        // test_partial_layout(&mut layout);
+        align_partial_layout_with_full_layout(&mut layout);
     }
 }

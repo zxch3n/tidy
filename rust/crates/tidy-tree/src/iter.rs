@@ -1,6 +1,6 @@
 use crate::Node;
 
-struct Iter<'a> {
+pub struct Iter<'a> {
     node: &'a Node,
     slot_stack: Vec<usize>,
     finished: bool,
@@ -46,7 +46,7 @@ impl<'a> Iterator for Iter<'a> {
 
 impl Node {
     #[inline]
-    fn iter(&self) -> Iter {
+    pub fn iter(&self) -> Iter {
         Iter {
             node: self,
             slot_stack: vec![],

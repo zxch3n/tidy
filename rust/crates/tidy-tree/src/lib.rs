@@ -4,6 +4,7 @@ mod iter;
 mod layout;
 mod node;
 mod utils;
+pub use iter::Iter;
 use std::{any::Any, collections::HashMap, ptr::NonNull};
 
 use geometry::Coord;

@@ -52,7 +52,7 @@ export class Renderer extends Disposable {
     const scale = Math.min(
       this.render.getWidth() / (gBox.width + 20),
       this.render.getHeight() / (gBox.height + 20),
-      2,
+      5,
     );
     g.animateTo({ scaleX: scale, scaleY: scale });
   }

@@ -244,13 +244,14 @@ impl Node {
         let mut s = String::new();
         if self.tidy.is_some() {
             s.push_str(&format!(
-                "x: {}, y: {}, width: {}, height: {}, rx: {}, mod: {}\n",
+                "x: {}, y: {}, width: {}, height: {}, rx: {}, mod: {}, id: {}\n",
                 self.x,
                 self.y,
                 self.width,
                 self.height,
                 self.relative_x,
-                self.tidy().modifier_to_subtree
+                self.tidy().modifier_to_subtree,
+                self.id
             ));
         } else {
             s.push_str(&format!(
