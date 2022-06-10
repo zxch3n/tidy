@@ -20,8 +20,8 @@ pub fn test_layout(layout: &mut dyn Layout) {
 
 pub fn test_partial_layout(layout: &mut dyn Layout) {
     let mut rng = StdRng::seed_from_u64(1001);
-    for _ in 0..100 {
-        let mut tree = gen_tree(&mut rng, 100);
+    for _ in 0..1000 {
+        let mut tree = gen_tree(&mut rng, 10);
         layout.layout(&mut tree);
         let mut nodes: Vec<NonNull<Node>> = vec![];
         tree.pre_order_traversal(|node| nodes.push(node.into()));
@@ -39,7 +39,8 @@ pub fn test_partial_layout(layout: &mut dyn Layout) {
             });
             if result.is_err() {
                 println!("\n\nTREE:\n{}", tree.str());
-                // println!("NEW NODE:\n{}", unsafe { new_node.as_ref() }.str());
+                println!("NEW NODE:\n{}", unsafe { new_node.as_ref() }.str());
+                // println!("CHANGED NODE:\n{}", unsafe { changed_node.as_ref() }.str());
                 // println!("\n\nPRE:\n{}", pre);
                 panic!();
             }

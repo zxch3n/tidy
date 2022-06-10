@@ -314,12 +314,10 @@ impl TidyLayout {
 
     fn first_walk_with_filter(&mut self, node: &mut Node, set: &SetUsize) {
         if !set.contains(node as *const _ as usize) {
-            node.set_extreme();
             invalidate_extreme_thread(node);
             return;
         }
 
-        invalidate_extreme_thread(node);
         if node.children.len() == 0 {
             node.set_extreme();
             return;
@@ -392,6 +390,7 @@ impl Layout for TidyLayout {
             set.insert(node.as_ptr() as usize);
             let mut node = unsafe { &mut *node.as_ptr() };
             while node.parent.is_some() {
+                invalidate_extreme_thread(node);
                 set.insert(node.parent.unwrap().as_ptr() as usize);
                 node = node.parent();
             }
@@ -426,10 +425,7 @@ fn init_node(node: &mut Node) {
 }
 
 fn invalidate_extreme_thread(node: &mut Node) {
-    if node.tidy().extreme_left.is_none() {
-        node.set_extreme();
-    }
-
+    node.set_extreme();
     let mut e_left = node.extreme_left().tidy_mut();
     e_left.thread_left = None;
     e_left.thread_right = None;
