@@ -10,4 +10,4 @@ test:
 	cargo nextest run
 
 clean:
-	rm -rf target/ crates/wasm/target/ crates/tidy-tree/target/ ../wasm_dist/
+	cargo clean
