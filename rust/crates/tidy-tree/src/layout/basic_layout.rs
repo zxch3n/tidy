@@ -101,7 +101,7 @@ mod basic_layout_test {
         second.append_child(Node::new(3, 10., 10.));
         root.append_child(second);
         root.append_child(Node::new(4, 10., 10.));
-        let mut layout = BasicLayout {
+        let layout = BasicLayout {
             parent_child_margin: 10.,
             peer_margin: 5.,
         };

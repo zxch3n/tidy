@@ -440,7 +440,7 @@ mod test {
     use crate::node::Node;
     #[test]
     fn test_tidy_layout() {
-        let mut tidy = TidyLayout::new(1., 1.);
+        let tidy = TidyLayout::new(1., 1.);
         let mut root = Node::new(0, 1., 1.);
         let first_child = Node::new_with_child(
             1,

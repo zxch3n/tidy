@@ -54,7 +54,7 @@ pub fn test_partial_layout(layout: &mut dyn Layout) {
 
 pub fn align_partial_layout_with_full_layout(layout: &mut dyn Layout) {
     let mut rng = StdRng::seed_from_u64(1001);
-    for i in 0..10 {
+    for _i in 0..10 {
         let mut tree = gen_tree(&mut rng, 100);
         layout.layout(&mut tree);
         let mut nodes: Vec<NonNull<Node>> = vec![];

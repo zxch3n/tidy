@@ -3,9 +3,9 @@
 mod aesthetic_rules;
 mod gen;
 use rand::{prelude::StdRng, SeedableRng};
-use tidy_tree::{geometry::Coord, BasicLayout, Layout, Node, TidyLayout};
+use tidy_tree::{BasicLayout, Layout, TidyLayout};
 extern crate test;
-use test::{black_box, Bencher};
+use test::Bencher;
 
 #[bench]
 fn bench_tidy_layout(bench: &mut Bencher) {
