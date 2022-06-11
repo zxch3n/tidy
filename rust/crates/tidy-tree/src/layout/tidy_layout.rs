@@ -174,7 +174,7 @@ impl Node {
 
 impl TidyLayout {
     fn separate(
-        &mut self,
+        &self,
         node: &mut Node,
         child_index: usize,
         mut y_list: LinkedYList,
@@ -215,7 +215,7 @@ impl TidyLayout {
     }
 
     fn set_left_thread(
-        &mut self,
+        &self,
         node: &mut Node,
         current_index: usize,
         target: &Node,
@@ -235,7 +235,7 @@ impl TidyLayout {
     }
 
     fn set_right_thread(
-        &mut self,
+        &self,
         node: &mut Node,
         current_index: usize,
         target: &Node,
@@ -291,7 +291,7 @@ impl TidyLayout {
         };
     }
 
-    fn first_walk(&mut self, node: &mut Node) {
+    fn first_walk(&self, node: &mut Node) {
         if node.children.len() == 0 {
             node.set_extreme();
             return;
@@ -311,7 +311,7 @@ impl TidyLayout {
         node.set_extreme();
     }
 
-    fn first_walk_with_filter(&mut self, node: &mut Node, set: &SetUsize) {
+    fn first_walk_with_filter(&self, node: &mut Node, set: &SetUsize) {
         if !set.contains(node as *const _ as usize) {
             invalidate_extreme_thread(node);
             return;
@@ -337,7 +337,7 @@ impl TidyLayout {
         node.set_extreme();
     }
 
-    fn second_walk(&mut self, node: &mut Node, mut mod_sum: Coord) {
+    fn second_walk(&self, node: &mut Node, mut mod_sum: Coord) {
         mod_sum += node.tidy_mut().modifier_to_subtree;
         node.x = node.relative_x + mod_sum;
         node.add_child_spacing();
@@ -347,7 +347,7 @@ impl TidyLayout {
         }
     }
 
-    fn second_walk_with_filter(&mut self, node: &mut Node, mut mod_sum: Coord, set: &SetUsize) {
+    fn second_walk_with_filter(&self, node: &mut Node, mut mod_sum: Coord, set: &SetUsize) {
         mod_sum += node.tidy_mut().modifier_to_subtree;
         let new_x = node.relative_x + mod_sum;
         if !set.contains(node as *const _ as usize) {
@@ -364,18 +364,14 @@ impl TidyLayout {
 }
 
 impl Layout for TidyLayout {
-    fn layout(&mut self, root: &mut Node) {
+    fn layout(&self, root: &mut Node) {
         root.pre_order_traversal_mut(|node| init_node(node));
         self.set_y_recursive(root);
         self.first_walk(root);
         self.second_walk(root, 0.);
     }
 
-    fn partial_layout(
-        &mut self,
-        root: &mut crate::Node,
-        changed: &[std::ptr::NonNull<crate::Node>],
-    ) {
+    fn partial_layout(&self, root: &mut crate::Node, changed: &[std::ptr::NonNull<crate::Node>]) {
         for node in changed.iter() {
             let node = unsafe { &mut *node.as_ptr() };
             if node.tidy.is_none() {

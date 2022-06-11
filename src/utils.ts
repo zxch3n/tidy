@@ -29,18 +29,20 @@ export function createNode(): Node {
 export function createTree(num: number): Node {
   const root = createNode();
   let arr = [root];
-  for (let i = 0; i < num; i += 10) {
-    const parentIndex = (arr.length * Math.random()) | 0;
-    for (let j = 0; j < 10; j++) {
-      const child = createNode();
-      const parent = arr[parentIndex];
-      parent.children.push(child);
-      child.parentId = parent.id;
-      arr.push(child);
+  const MAX_CHOSEN_SIZE = 1000;
+  for (let i = 0; i < num; i++) {
+    let parentIndex = 0;
+    if (arr.length < MAX_CHOSEN_SIZE) {
+      parentIndex = (arr.length * Math.random()) | 0;
+    } else {
+      parentIndex = (arr.length - 1 - MAX_CHOSEN_SIZE * Math.random()) | 0;
     }
-    if (arr.length > 200) {
-      arr = arr.slice(100);
-    }
+
+    const parent = arr[parentIndex];
+    const child = createNode();
+    parent.children.push(child);
+    child.parentId = parent.id;
+    arr.push(child);
   }
 
   return root;

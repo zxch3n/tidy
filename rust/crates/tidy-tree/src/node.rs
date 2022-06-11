@@ -6,12 +6,12 @@ use crate::{geometry::Coord, layout::BoundingBox};
 pub struct TidyData {
     pub thread_left: Option<NonNull<Node>>,
     pub thread_right: Option<NonNull<Node>>,
-    /// ```
+    /// ```text
     /// this.extreme_left == this.thread_left.extreme_left ||
     /// this.extreme_left == this.children[0].extreme_left
     /// ```
     pub extreme_left: Option<NonNull<Node>>,
-    /// ```
+    /// ```text
     /// this.extreme_right == this.thread_right.extreme_right ||
     /// this.extreme_right == this.children[-1].extreme_right
     /// ```

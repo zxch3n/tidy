@@ -9,32 +9,34 @@ describe('tidy', () => {
   /**
    * it takes 20ms to layout 100k nodes
    */
-  it('benchmark', async () => {
+  it('benchmark tidy', async () => {
     const wasm = await readFile(
       path.join(__dirname, '../wasm_dist/wasm_bg.wasm'),
     );
     await initWasm(wasm);
     const tidy = await TidyLayout.create(LayoutType.Tidy);
-    const root = createTree(100000);
+    const root = createTree(100_000);
     tidy.set_root(root);
     const start = performance.now();
     for (let i = 0; i < 20; i++) {
       tidy.layout();
     }
-    console.log((performance.now() - start) / 20);
-    // const nodes: Node[] = [];
-    // visit(root, (node) => {
-    //   for (const other of nodes) {
-    //     expect(
-    //       node.x > other.x + other.width ||
-    //         node.x + node.width < other.x ||
-    //         node.y > other.y + other.height ||
-    //         node.y + node.height < other.y,
-    //     ).toBeTruthy();
-    //   }
+    console.log('tidy layout speed', (performance.now() - start) / 20);
+  });
 
-    //   nodes.push(node);
-    // });
+  it('benchmark naive', async () => {
+    const wasm = await readFile(
+      path.join(__dirname, '../wasm_dist/wasm_bg.wasm'),
+    );
+    await initWasm(wasm);
+    const tidy = await TidyLayout.create(LayoutType.Basic);
+    const root = createTree(100_000);
+    tidy.set_root(root);
+    const start = performance.now();
+    for (let i = 0; i < 20; i++) {
+      tidy.layout();
+    }
+    console.log('naive layout speed', (performance.now() - start) / 20);
   });
 
   it('debug', () => {
