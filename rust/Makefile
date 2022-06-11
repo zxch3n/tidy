@@ -11,3 +11,7 @@ test:
 
 clean:
 	cargo clean
+
+bench-wasm:
+	cd crates/wasm && \
+	wasm-pack test --firefox --headless --release

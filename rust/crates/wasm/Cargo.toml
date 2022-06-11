@@ -5,7 +5,7 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 wasm-bindgen = "0.2.74"
@@ -13,3 +13,13 @@ tidy-tree = { path = "../tidy-tree" }
 
 [dev-dependencies]
 getrandom = { version = "0.2", features = ["js"] }
+rand = "0.8.5"
+wasm-bindgen-test = "0.3.30"
+
+[dependencies.web-sys]
+version = "0.3.4"
+features = [
+  'Window',
+  'Performance',
+  'PerformanceTiming'
+]
