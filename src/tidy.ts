@@ -125,7 +125,7 @@ export class TidyLayout extends Disposable {
       height.push(node.height);
       parents.push(node.parentId ?? NULL_ID());
       this.idToNode.set(node.id!, node as InnerNode);
-      for (const child of node.children) {
+      for (const child of node.children.concat().reverse()) {
         if (child.parentId == null) {
           child.parentId = node.id;
         }

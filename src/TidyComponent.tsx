@@ -29,6 +29,7 @@ export const TidyComponent = ({ root, layoutType, updateTrigger }: Props) => {
       layoutRef.current = await TidyLayout.create(type);
       const innerRoot = layoutRef.current.set_root(root);
       layoutRef.current.layout();
+      console.log(innerRoot);
       renderRef.current.init(innerRoot);
     };
 

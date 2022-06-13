@@ -1,19 +1,34 @@
 import { TidyLayout, initWasm, LayoutType } from '../src/tidy';
-import { describe, it } from 'vitest';
+import { beforeAll, expect, describe, it } from 'vitest';
 import { createTree } from '../src/utils';
 import { readFile } from 'fs/promises';
 import { debugStrToTree } from '../src/stories/debugToTree';
 import * as path from 'path';
 
 describe('tidy', () => {
-  /**
-   * it takes 20ms to layout 100k nodes
-   */
-  it('benchmark tidy', async () => {
+  beforeAll(async () => {
     const wasm = await readFile(
       path.join(__dirname, '../wasm_dist/wasm_bg.wasm'),
     );
     await initWasm(wasm);
+  });
+
+  it('order', async () => {
+    const tidy = await TidyLayout.create(LayoutType.Tidy);
+    const root = createTree(100);
+    tidy.set_root(root);
+    tidy.layout();
+    for (let i = 1; i < root.children.length; i++) {
+      expect(root.children[i].x - root.children[i].width / 2).toBeGreaterThan(
+        root.children[i - 1].x - root.children[i - 1].width / 2,
+      );
+    }
+  });
+
+  /**
+   * it takes 20ms to layout 100k nodes
+   */
+  it('benchmark tidy', async () => {
     const tidy = await TidyLayout.create(LayoutType.Tidy);
     const root = createTree(100_000);
     tidy.set_root(root);
@@ -25,10 +40,6 @@ describe('tidy', () => {
   });
 
   it('benchmark naive', async () => {
-    const wasm = await readFile(
-      path.join(__dirname, '../wasm_dist/wasm_bg.wasm'),
-    );
-    await initWasm(wasm);
     const tidy = await TidyLayout.create(LayoutType.Basic);
     const root = createTree(100_000);
     tidy.set_root(root);

@@ -54,3 +54,47 @@ export const TidyLayout = ({ layoutType, ...props }: Props) => {
     </div>
   );
 };
+
+export const Example0 = () => {
+  return (
+    <TidyComponent
+      root={node(10, 10, [
+        node(10, 10, [
+          node(10, 10, [
+            node(10, 10),
+            node(10, 10),
+            node(10, 10),
+            node(10, 10),
+            node(10, 10),
+            node(10, 10),
+            node(10, 10),
+            node(10, 10),
+            node(10, 10),
+            node(10, 10),
+            node(10, 10),
+            node(10, 10),
+            node(10, 10),
+            node(10, 10),
+            node(10, 10),
+            node(10, 10),
+          ]),
+        ]),
+        node(10, 10, [node(10, 10), node(10, 10), node(10, 10), node(10, 10)]),
+        node(10, 10),
+        node(10, 40),
+      ])}
+      updateTrigger={0}
+      layoutType={LayoutTypeStr.Tidy}
+    />
+  );
+};
+
+function node(width: number, height: number, children: Node[] = []): Node {
+  return {
+    x: 0,
+    y: 0,
+    width,
+    height,
+    children,
+  };
+}

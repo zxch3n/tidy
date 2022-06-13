@@ -12,7 +12,3 @@ tinyset = "0.4.10"
 [dev-dependencies]
 rand = "0.8.5"
 
-[profile.bench]
-opt-level = 3
-overflow-checks = false
-
