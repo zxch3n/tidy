@@ -171,4 +171,11 @@ mod test {
         test_partial_layout(&mut layout);
         align_partial_layout_with_full_layout(&mut layout);
     }
+
+    #[test]
+    fn test_layered_tidy_layout() {
+        let mut layout = TidyLayout::new_layered(10., 10.);
+        test_layout(&mut layout);
+        test_partial_layout(&mut layout);
+    }
 }

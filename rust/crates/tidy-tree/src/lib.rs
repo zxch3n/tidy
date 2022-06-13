@@ -16,6 +16,7 @@ pub use node::Node;
 pub enum LayoutType {
     Basic,
     Tidy,
+    LayeredTidy,
 }
 
 pub struct TidyTree {
@@ -42,10 +43,16 @@ impl TidyTree {
         TidyTree {
             layout_type: LayoutType::Tidy,
             root: Default::default(),
-            layout: Box::new(TidyLayout {
-                parent_child_margin: 10.,
-                peer_margin: 10.,
-            }),
+            layout: Box::new(TidyLayout::new(10., 10.)),
+            map: HashMap::new(),
+        }
+    }
+
+    pub fn with_layered_tidy() -> Self {
+        TidyTree {
+            layout_type: LayoutType::Tidy,
+            root: Default::default(),
+            layout: Box::new(TidyLayout::new_layered(10., 10.)),
             map: HashMap::new(),
         }
     }
@@ -63,11 +70,9 @@ impl TidyTree {
                 });
             }
             LayoutType::Tidy => {
-                self.layout = Box::new(TidyLayout {
-                    parent_child_margin: 10.,
-                    peer_margin: 10.,
-                });
+                self.layout = Box::new(TidyLayout::new(10., 10.));
             }
+            LayoutType::LayeredTidy => self.layout = Box::new(TidyLayout::new_layered(10., 10.)),
         }
 
         self.layout_type = layout_type;

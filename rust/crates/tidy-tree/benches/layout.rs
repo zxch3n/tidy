@@ -20,7 +20,7 @@ mod gen;
 fn basic() {
     let mut rng = StdRng::seed_from_u64(1001);
     let mut tree = gen::gen_tree(&mut rng, 100_000);
-    let layout = BasicLayout {
+    let mut layout = BasicLayout {
         parent_child_margin: 10.,
         peer_margin: 10.,
     };

@@ -14,10 +14,9 @@ let promise: Promise<InitOutput> | undefined;
 
 export function initWasm(
   module_or_path?: InitInput | Promise<InitInput>,
-  maybe_memory?: WebAssembly.Memory,
 ): Promise<InitOutput> {
   if (!promise) {
-    promise = _initWasm(module_or_path, maybe_memory);
+    promise = _initWasm(module_or_path);
   }
 
   return promise;

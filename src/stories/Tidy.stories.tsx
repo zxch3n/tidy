@@ -8,7 +8,11 @@ export default {
   component: TidyComponent,
   argTypes: {
     layoutType: {
-      options: [LayoutTypeStr.Tidy, LayoutTypeStr.Basic],
+      options: [
+        LayoutTypeStr.Tidy,
+        LayoutTypeStr.Basic,
+        LayoutTypeStr.LayeredTidy,
+      ],
       defaultValue: LayoutTypeStr.Basic,
     },
   },

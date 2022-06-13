@@ -9,6 +9,7 @@ pub struct Tidy(TidyTree);
 pub enum WasmLayoutType {
     Basic,
     Tidy,
+    LayeredTidy,
 }
 
 #[wasm_bindgen]
@@ -25,10 +26,15 @@ impl Tidy {
         Tidy(TidyTree::with_tidy_layout())
     }
 
+    pub fn with_layered_tidy() -> Self {
+        Tidy(TidyTree::with_layered_tidy())
+    }
+
     pub fn change_layout(&mut self, layout_type: WasmLayoutType) {
         match layout_type {
             WasmLayoutType::Basic => self.0.change_layout(LayoutType::Basic),
             WasmLayoutType::Tidy => self.0.change_layout(LayoutType::Tidy),
+            WasmLayoutType::LayeredTidy => self.0.change_layout(LayoutType::LayeredTidy),
         }
     }
 

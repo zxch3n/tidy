@@ -31,7 +31,7 @@ impl Default for BoundingBox {
 }
 
 impl Layout for BasicLayout {
-    fn layout(&self, root: &mut Node) {
+    fn layout(&mut self, root: &mut Node) {
         root.pre_order_traversal_mut(|node| {
             node.tidy = None;
             node.x = 0.;
@@ -51,13 +51,13 @@ impl Layout for BasicLayout {
         });
     }
 
-    fn partial_layout(&self, root: &mut Node, changed: &[std::ptr::NonNull<Node>]) {
+    fn partial_layout(&mut self, root: &mut Node, changed: &[std::ptr::NonNull<Node>]) {
         todo!()
     }
 }
 
 impl BasicLayout {
-    fn update_meta(&self, node: &mut Node) {
+    fn update_meta(&mut self, node: &mut Node) {
         node.bbox = BoundingBox {
             total_height: node.height,
             total_width: node.width,
@@ -101,7 +101,7 @@ mod basic_layout_test {
         second.append_child(Node::new(3, 10., 10.));
         root.append_child(second);
         root.append_child(Node::new(4, 10., 10.));
-        let layout = BasicLayout {
+        let mut layout = BasicLayout {
             parent_child_margin: 10.,
             peer_margin: 5.,
         };

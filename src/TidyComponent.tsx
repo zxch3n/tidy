@@ -6,6 +6,7 @@ import { LayoutType, Node, TidyLayout } from './tidy';
 export enum LayoutTypeStr {
   Tidy = 'tidy',
   Basic = 'basic',
+  LayeredTidy = 'layeredTidy',
 }
 
 interface Props {
@@ -15,7 +16,20 @@ interface Props {
 }
 
 function getLayoutType(type?: LayoutTypeStr) {
-  return type === LayoutTypeStr.Tidy ? LayoutType.Tidy : LayoutType.Basic;
+  if (type == null) {
+    return LayoutType.Tidy;
+  }
+
+  switch (type) {
+    case LayoutTypeStr.Basic:
+      return LayoutType.Basic;
+    case LayoutTypeStr.Tidy:
+      return LayoutType.Tidy;
+    case LayoutTypeStr.LayeredTidy:
+      return LayoutType.LayeredTidy;
+    default:
+      throw new Error();
+  }
 }
 
 export const TidyComponent = ({ root, layoutType, updateTrigger }: Props) => {

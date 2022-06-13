@@ -1,4 +1,4 @@
-use std::ptr::NonNull;
+use std::{collections::VecDeque, ptr::NonNull};
 
 use crate::{geometry::Coord, layout::BoundingBox};
 
@@ -117,8 +117,23 @@ impl Node {
         }
     }
 
-    pub fn parent(&mut self) -> &mut Self {
-        unsafe { self.parent.unwrap().as_mut() }
+    pub fn depth(&self) -> usize {
+        let mut depth = 0;
+        let mut node = self;
+        while node.parent.is_some() {
+            node = node.parent().unwrap();
+            depth += 1;
+        }
+
+        depth
+    }
+
+    pub fn parent_mut(&mut self) -> Option<&mut Self> {
+        unsafe { self.parent.map_or(None, |mut node| Some(node.as_mut())) }
+    }
+
+    pub fn parent(&self) -> Option<&Self> {
+        unsafe { self.parent.map_or(None, |node| Some(node.as_ref())) }
     }
 
     pub fn bottom(&self) -> Coord {
@@ -236,6 +251,35 @@ impl Node {
             f(node);
             for child in node.children.iter_mut() {
                 stack.push(child.as_ref().into());
+            }
+        }
+    }
+
+    pub fn bfs_traversal_with_depth_mut<F>(&mut self, mut f: F)
+    where
+        F: FnMut(&mut Node, usize),
+    {
+        let mut queue: VecDeque<(NonNull<Self>, usize)> = VecDeque::new();
+        queue.push_back((self.into(), 0));
+        while let Some((mut node, depth)) = queue.pop_front() {
+            let node = unsafe { node.as_mut() };
+            f(node, depth);
+            for child in node.children.iter_mut() {
+                queue.push_back((child.as_ref().into(), depth + 1));
+            }
+        }
+    }
+
+    pub fn pre_order_traversal_with_depth_mut<F>(&mut self, mut f: F)
+    where
+        F: FnMut(&mut Node, usize),
+    {
+        let mut stack: Vec<(NonNull<Self>, usize)> = vec![(self.into(), 0)];
+        while let Some((mut node, depth)) = stack.pop() {
+            let node = unsafe { node.as_mut() };
+            f(node, depth);
+            for child in node.children.iter_mut() {
+                stack.push((child.as_ref().into(), depth + 1));
             }
         }
     }

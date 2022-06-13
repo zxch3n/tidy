@@ -7,6 +7,6 @@ pub use basic_layout::{BasicLayout, BoundingBox};
 pub use tidy_layout::TidyLayout;
 
 pub trait Layout {
-    fn layout(&self, root: &mut Node);
-    fn partial_layout(&self, root: &mut Node, changed: &[NonNull<Node>]);
+    fn layout(&mut self, root: &mut Node);
+    fn partial_layout(&mut self, root: &mut Node, changed: &[NonNull<Node>]);
 }
