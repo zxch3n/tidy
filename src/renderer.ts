@@ -43,15 +43,28 @@ export class Renderer extends Disposable {
     this.rescale();
   }
 
+  private clear() {
+    this.render.clear();
+    if (this.group) {
+      this.render.remove(this.group);
+    }
+    this.nodeMap.clear();
+    this.rectMap.clear();
+  }
+
   private rescale() {
     if (!this.root || !this.group) {
       return;
     }
     const g = this.group;
     const gBox = g.getBoundingRect();
+    const w = this.render.getWidth();
+    const h = this.render.getHeight();
     const scale = Math.min(
-      this.render.getWidth() / (gBox.width + 20),
-      this.render.getHeight() / (gBox.height + 20),
+      Math.abs(w / -gBox.x / 2),
+      Math.abs(w / (gBox.width + gBox.x) / 2),
+      w / (gBox.width + 20),
+      h / (gBox.height + 50),
       5,
     );
     g.animateTo({ scaleX: scale, scaleY: scale });
@@ -102,8 +115,9 @@ export class Renderer extends Disposable {
       return;
     }
     const g = this.group;
-
+    const removedNodeIds = new Set<number>(this.rectMap.keys());
     visit(this.root, (node) => {
+      removedNodeIds.delete(node.id);
       if (!this.rectMap.has(node.id)) {
         this.addNode(node, g, true);
         return;
@@ -131,6 +145,20 @@ export class Renderer extends Disposable {
         });
       }
     });
+
+    for (const id of removedNodeIds) {
+      const rect = this.rectMap.get(id)!;
+      this.group.remove(rect);
+      this.rectMap.delete(id);
+      const lines = (this.lineSourceMap.get(id) ?? []).concat(
+        this.lineTargetMap.get(id) ?? [],
+      );
+      for (const line of lines) {
+        this.group.remove(line.line);
+      }
+      this.lineSourceMap.delete(id);
+      this.lineTargetMap.delete(id);
+    }
     this.rescale();
   }
 }

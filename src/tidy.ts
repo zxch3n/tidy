@@ -65,6 +65,8 @@ export class TidyLayout extends Disposable {
       this.tidy = TidyWasm.with_basic_layout();
     } else if (type === LayoutType.Tidy) {
       this.tidy = TidyWasm.with_tidy_layout();
+    } else if (type === LayoutType.LayeredTidy) {
+      this.tidy = TidyWasm.with_layered_tidy();
     } else {
       throw new Error('not implemented');
     }
@@ -81,7 +83,9 @@ export class TidyLayout extends Disposable {
 
   layout(updated = false) {
     if (updated) {
+      const removedNodeId = new Set(this.idToNode.keys());
       visit(this.root!, (node) => {
+        removedNodeId.delete(node.id);
         if (this.idToNode.has(node.id)) {
           return;
         }
@@ -94,6 +98,11 @@ export class TidyLayout extends Disposable {
           node.parentId ?? NULL_ID(),
         );
       });
+
+      for (const nodeId of removedNodeId) {
+        this.tidy.remove_node(nodeId);
+        this.idToNode.delete(nodeId);
+      }
     }
 
     this.tidy.layout();

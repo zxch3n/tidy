@@ -97,6 +97,20 @@ impl TidyTree {
         self.map.insert(id, ptr);
     }
 
+    pub fn remove_node(&mut self, id: usize) {
+        if self.is_empty() {
+            return;
+        }
+
+        if let Some(node) = self.map.get(&id) {
+            let node = unsafe { &mut *node.as_ptr() };
+            node.pre_order_traversal(|node| {
+                self.map.remove(&node.id);
+            });
+            node.parent_mut().unwrap().remove_child(id);
+        }
+    }
+
     pub fn data(&mut self, id: &[usize], width: &[Coord], height: &[Coord], parent_id: &[usize]) {
         for (i, &id) in id.iter().enumerate() {
             let width = width[i];

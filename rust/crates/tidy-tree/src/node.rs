@@ -270,6 +270,13 @@ impl Node {
         }
     }
 
+    pub fn remove_child(&mut self, id: usize) {
+        let pos = self.children.iter().position(|node| node.id == id);
+        if let Some(index) = pos {
+            self.children.remove(index);
+        }
+    }
+
     pub fn pre_order_traversal_with_depth_mut<F>(&mut self, mut f: F)
     where
         F: FnMut(&mut Node, usize),

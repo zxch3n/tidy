@@ -49,7 +49,14 @@ export const TidyComponent = ({ root, layoutType, updateTrigger }: Props) => {
 
     func();
     return () => {
+      layoutRef.current?.dispose();
+      layoutRef.current = undefined;
+    };
+  }, [root]);
+  useEffect(() => {
+    return () => {
       renderRef.current?.dispose();
+      renderRef.current = undefined;
     };
   }, []);
   useEffect(() => {

@@ -38,6 +38,10 @@ impl Tidy {
         }
     }
 
+    pub fn remove_node(&mut self, id: usize) {
+        self.0.remove_node(id);
+    }
+
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
     }
