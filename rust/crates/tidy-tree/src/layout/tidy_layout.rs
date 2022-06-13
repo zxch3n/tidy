@@ -350,7 +350,7 @@ impl TidyLayout {
     fn second_walk_with_filter(&self, node: &mut Node, mut mod_sum: Coord, set: &SetUsize) {
         mod_sum += node.tidy_mut().modifier_to_subtree;
         let new_x = node.relative_x + mod_sum;
-        if !set.contains(node as *const _ as usize) {
+        if (new_x - node.x).abs() < 1e-8 && !set.contains(node as *const _ as usize) {
             return;
         }
 
@@ -358,7 +358,7 @@ impl TidyLayout {
         node.add_child_spacing();
 
         for child in node.children.iter_mut() {
-            self.second_walk(child, mod_sum);
+            self.second_walk_with_filter(child, mod_sum, set);
         }
     }
 }
@@ -377,10 +377,11 @@ impl Layout for TidyLayout {
             if node.tidy.is_none() {
                 init_node(node);
             }
+
+            // TODO: optimize
+            self.set_y_recursive(node);
         }
 
-        // TODO: optimize
-        self.set_y_recursive(root);
         let mut set: SetUsize = SetUsize::new();
         for node in changed.iter() {
             set.insert(node.as_ptr() as usize);
@@ -393,9 +394,9 @@ impl Layout for TidyLayout {
         }
 
         self.first_walk_with_filter(root, &set);
-        // TODO: optimize
-        // self.second_walk_with_filter(root, 0., &set);
-        self.second_walk(root, 0.);
+        // TODO: this can be optimized with onscreen detection,
+        // then all nodes' absolute x position can be evaluate lazily
+        self.second_walk_with_filter(root, 0., &set);
     }
 }
 
