@@ -29,7 +29,7 @@ export function createNode(): Node {
 export function createTree(num: number): Node {
   const root = createNode();
   let arr = [root];
-  const MAX_CHOSEN_SIZE = 30;
+  const MAX_CHOSEN_SIZE = 16;
   for (let i = 0; i < num; i++) {
     let parentIndex = 0;
     if (arr.length < MAX_CHOSEN_SIZE) {

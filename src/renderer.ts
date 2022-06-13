@@ -43,9 +43,11 @@ export class Renderer extends Disposable {
     this.rescale();
   }
 
-  private clear() {
+  clear() {
+    console.log('CLEAR', this.group, this.rectMap.size);
     this.render.clear();
     if (this.group) {
+      this.group.removeAll();
       this.render.remove(this.group);
     }
     this.nodeMap.clear();
@@ -160,6 +162,9 @@ export class Renderer extends Disposable {
       this.lineTargetMap.delete(id);
     }
     this.rescale();
+    setTimeout(() => {
+      this.rescale();
+    }, 200);
   }
 }
 

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 
 import { Renderer } from './renderer';
 import { LayoutType, Node, TidyLayout } from './tidy';
@@ -37,29 +37,7 @@ export const TidyComponent = ({ root, layoutType, updateTrigger }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const layoutRef = useRef<TidyLayout>();
   const type = getLayoutType(layoutType);
-  useEffect(() => {
-    const func = async () => {
-      renderRef.current = new Renderer(containerRef.current!);
-      layoutRef.current = await TidyLayout.create(type);
-      const innerRoot = layoutRef.current.set_root(root);
-      layoutRef.current.layout();
-      console.log(innerRoot);
-      renderRef.current.init(innerRoot);
-    };
-
-    func();
-    return () => {
-      layoutRef.current?.dispose();
-      layoutRef.current = undefined;
-    };
-  }, [root]);
-  useEffect(() => {
-    return () => {
-      renderRef.current?.dispose();
-      renderRef.current = undefined;
-    };
-  }, []);
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!layoutRef.current || !renderRef.current) {
       return;
     }
@@ -68,6 +46,34 @@ export const TidyComponent = ({ root, layoutType, updateTrigger }: Props) => {
     layoutRef.current.layout(true);
     renderRef.current.update();
   }, [updateTrigger, type]);
+  useLayoutEffect(() => {
+    let done = false;
+    const func = async () => {
+      renderRef.current = new Renderer(containerRef.current!);
+      layoutRef.current = await TidyLayout.create(type);
+      if (done) {
+        return;
+      }
+
+      const innerRoot = layoutRef.current.set_root(root);
+      layoutRef.current.layout();
+      renderRef.current.init(innerRoot);
+    };
+
+    func();
+    return () => {
+      done = true;
+      layoutRef.current?.dispose();
+      layoutRef.current = undefined;
+      renderRef.current?.clear();
+    };
+  }, [root]);
+  useEffect(() => {
+    return () => {
+      renderRef.current?.dispose();
+      renderRef.current = undefined;
+    };
+  }, []);
 
   return <div ref={containerRef} style={{ width: '100%', minHeight: 500 }} />;
 };

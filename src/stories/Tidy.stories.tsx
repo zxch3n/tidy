@@ -5,6 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { useDebounce } from 'react-use';
 import { Node } from '../tidy';
 import { LayoutTypeStr, TidyComponent } from '../TidyComponent';
 import { createNode, createTree, visit } from '../utils';
@@ -39,19 +40,22 @@ export const TidyLayout = ({
   const [root, setRoot] = useState(() => {
     return createTree(1);
   });
-  const prevNum = useRef(0);
-  useLayoutEffect(() => {
-    if (prevNum.current == 0) {
-      setRoot(createTree(num));
-    } else if (num < prevNum.current) {
-      deleteRandomNode(root, prevNum.current - num);
-    } else if (num > prevNum.current) {
-      insertRandomNode(root, num - prevNum.current);
-    }
+  const prevNum = useRef(1);
+  useDebounce(
+    () => {
+      let currentNum = nodeNum(root);
+      if (num < currentNum) {
+        deleteRandomNode(root, currentNum - num);
+      } else if (num > currentNum) {
+        insertRandomNode(root, num - currentNum);
+      }
 
-    setUpdate((updateTrigger) => updateTrigger + 1);
-    prevNum.current = num;
-  }, [num]);
+      setUpdate((updateTrigger) => updateTrigger + 1);
+      prevNum.current = num;
+    },
+    100,
+    [num],
+  );
   const addNode = useCallback(() => {
     insertRandomNode(root, 1);
     setUpdate((updateTrigger) => updateTrigger + 1);
@@ -110,8 +114,12 @@ export const Example0 = () => {
 };
 
 function deleteRandomNode(root: Node, num: number) {
-  while (num > 0) {
+  while (num > 0 && root.children.length > 0) {
     visit(root, (node, depth) => {
+      if (num === 0) {
+        return;
+      }
+
       for (let i = 0; i < node.children.length; i++) {
         if (node.children[i].children.length === 0) {
           node.children.splice(i, 1);
@@ -139,10 +147,11 @@ function insertRandomNode(root: Node, num: number = 1) {
     nodes = nodes.filter(([_, d]) => d >= depth);
   }
   for (let i = 0; i < num; i++) {
-    const node = nodes[(Math.random() * nodes.length) | 0][0];
+    const [node, d] = nodes[(Math.random() * nodes.length) | 0];
     const child = createNode();
     child.parentId = node.id;
     node.children.push(child);
+    nodes.push([child, d + 1]);
   }
 }
 
@@ -154,4 +163,10 @@ function node(width: number, height: number, children: Node[] = []): Node {
     height,
     children,
   };
+}
+
+function nodeNum(root: Node) {
+  let count = 0;
+  visit(root, () => count++);
+  return count;
 }
