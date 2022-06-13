@@ -14,7 +14,7 @@ fn bench_tidy() {
     let performance = get_performance();
     let mut rng = StdRng::seed_from_u64(1001);
     let tree = gen_tree(&mut rng, 100_000);
-    let mut layout = Tidy::with_tidy_layout();
+    let mut layout = Tidy::with_tidy_layout(10., 10.);
     tree.pre_order_traversal(|node| {
         if node.parent.is_some() {
             layout.add_node(

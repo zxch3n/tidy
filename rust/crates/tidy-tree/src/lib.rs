@@ -27,32 +27,32 @@ pub struct TidyTree {
 }
 
 impl TidyTree {
-    pub fn with_basic_layout() -> Self {
+    pub fn with_basic_layout(parent_child_margin: Coord, peer_margin: Coord) -> Self {
         TidyTree {
             layout_type: LayoutType::Basic,
             root: Default::default(),
             layout: Box::new(BasicLayout {
-                parent_child_margin: 10.,
-                peer_margin: 10.,
+                parent_child_margin,
+                peer_margin,
             }),
             map: HashMap::new(),
         }
     }
 
-    pub fn with_tidy_layout() -> Self {
+    pub fn with_tidy_layout(parent_child_margin: Coord, peer_margin: Coord) -> Self {
         TidyTree {
             layout_type: LayoutType::Tidy,
             root: Default::default(),
-            layout: Box::new(TidyLayout::new(10., 10.)),
+            layout: Box::new(TidyLayout::new(parent_child_margin, peer_margin)),
             map: HashMap::new(),
         }
     }
 
-    pub fn with_layered_tidy() -> Self {
+    pub fn with_layered_tidy(parent_child_margin: Coord, peer_margin: Coord) -> Self {
         TidyTree {
             layout_type: LayoutType::Tidy,
             root: Default::default(),
-            layout: Box::new(TidyLayout::new_layered(10., 10.)),
+            layout: Box::new(TidyLayout::new_layered(parent_child_margin, peer_margin)),
             map: HashMap::new(),
         }
     }
@@ -62,17 +62,21 @@ impl TidyTree {
             return;
         }
 
+        let parent_child_margin = self.layout.parent_child_margin();
+        let peer_margin = self.layout.peer_margin();
         match layout_type {
             LayoutType::Basic => {
                 self.layout = Box::new(BasicLayout {
-                    parent_child_margin: 10.,
-                    peer_margin: 10.,
+                    parent_child_margin,
+                    peer_margin,
                 });
             }
             LayoutType::Tidy => {
-                self.layout = Box::new(TidyLayout::new(10., 10.));
+                self.layout = Box::new(TidyLayout::new(parent_child_margin, peer_margin));
             }
-            LayoutType::LayeredTidy => self.layout = Box::new(TidyLayout::new_layered(10., 10.)),
+            LayoutType::LayeredTidy => {
+                self.layout = Box::new(TidyLayout::new_layered(parent_child_margin, peer_margin))
+            }
         }
 
         self.layout_type = layout_type;

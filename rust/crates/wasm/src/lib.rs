@@ -18,16 +18,22 @@ impl Tidy {
         NULL_ID
     }
 
-    pub fn with_basic_layout() -> Self {
-        Tidy(TidyTree::with_basic_layout())
+    pub fn with_basic_layout(parent_child_margin: Coord, peer_margin: Coord) -> Self {
+        Tidy(TidyTree::with_basic_layout(
+            parent_child_margin,
+            peer_margin,
+        ))
     }
 
-    pub fn with_tidy_layout() -> Self {
-        Tidy(TidyTree::with_tidy_layout())
+    pub fn with_tidy_layout(parent_child_margin: Coord, peer_margin: Coord) -> Self {
+        Tidy(TidyTree::with_tidy_layout(parent_child_margin, peer_margin))
     }
 
-    pub fn with_layered_tidy() -> Self {
-        Tidy(TidyTree::with_layered_tidy())
+    pub fn with_layered_tidy(parent_child_margin: Coord, peer_margin: Coord) -> Self {
+        Tidy(TidyTree::with_layered_tidy(
+            parent_child_margin,
+            peer_margin,
+        ))
     }
 
     pub fn change_layout(&mut self, layout_type: WasmLayoutType) {

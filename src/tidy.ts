@@ -54,19 +54,19 @@ export class TidyLayout extends Disposable {
   private nextId = 1;
   private root: InnerNode | undefined;
   private idToNode: Map<number, InnerNode> = new Map();
-  static async create(type: LayoutType = LayoutType.Basic) {
+  static async create(type: LayoutType = LayoutType.Tidy) {
     await initWasm();
     return new TidyLayout(type);
   }
 
-  private constructor(type: LayoutType = LayoutType.Basic) {
+  private constructor(type: LayoutType = LayoutType.Tidy) {
     super();
     if (type === LayoutType.Basic) {
-      this.tidy = TidyWasm.with_basic_layout();
+      this.tidy = TidyWasm.with_basic_layout(40, 10);
     } else if (type === LayoutType.Tidy) {
-      this.tidy = TidyWasm.with_tidy_layout();
+      this.tidy = TidyWasm.with_tidy_layout(40, 10);
     } else if (type === LayoutType.LayeredTidy) {
-      this.tidy = TidyWasm.with_layered_tidy();
+      this.tidy = TidyWasm.with_layered_tidy(40, 10);
     } else {
       throw new Error('not implemented');
     }

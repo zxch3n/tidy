@@ -161,10 +161,11 @@ export class Renderer extends Disposable {
       this.lineSourceMap.delete(id);
       this.lineTargetMap.delete(id);
     }
-    this.rescale();
-    setTimeout(() => {
-      this.rescale();
-    }, 200);
+    for (let i = 0; i <= 1000; i += 500) {
+      setTimeout(() => {
+        this.rescale();
+      }, i);
+    }
   }
 }
 

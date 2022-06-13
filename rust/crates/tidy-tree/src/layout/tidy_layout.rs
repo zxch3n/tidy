@@ -422,6 +422,14 @@ impl Layout for TidyLayout {
         self.second_walk(root, 0.);
     }
 
+    fn parent_child_margin(&self) -> Coord {
+        self.parent_child_margin
+    }
+
+    fn peer_margin(&self) -> Coord {
+        self.peer_margin
+    }
+
     fn partial_layout(
         &mut self,
         root: &mut crate::Node,

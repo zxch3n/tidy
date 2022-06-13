@@ -16,10 +16,29 @@ function randomId(): number {
 }
 
 export function createNode(): Node {
+  let width = 1;
+  let height = 1;
+
+  if (Math.random() < 0.1) {
+    width = (50 * Math.random() + 50) | 0;
+  } else {
+    width = (10 * Math.random() + 10) | 0;
+  }
+
+  if (Math.random() < 0.1) {
+    height = (50 * Math.random() + 50) | 0;
+  } else {
+    height = (10 * Math.random() + 10) | 0;
+  }
+
+  if (Math.random() < 0.03) {
+    width = height = (50 * Math.random() + 50) | 0;
+  }
+
   return {
     id: randomId(),
-    height: (10 * Math.random() + 10) | 0,
-    width: (10 * Math.random() + 10) | 0,
+    height,
+    width,
     x: 0,
     y: 0,
     children: [],

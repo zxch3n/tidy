@@ -20,7 +20,7 @@ export default {
         LayoutTypeStr.Basic,
         LayoutTypeStr.LayeredTidy,
       ],
-      defaultValue: LayoutTypeStr.Basic,
+      defaultValue: LayoutTypeStr.Tidy,
     },
   },
 };
@@ -47,7 +47,7 @@ export const TidyLayout = ({
       if (num < currentNum) {
         deleteRandomNode(root, currentNum - num);
       } else if (num > currentNum) {
-        insertRandomNode(root, num - currentNum);
+        insertRandomNodeDepthFirst(root, num - currentNum);
       }
 
       setUpdate((updateTrigger) => updateTrigger + 1);
@@ -57,7 +57,7 @@ export const TidyLayout = ({
     [num],
   );
   const addNode = useCallback(() => {
-    insertRandomNode(root, 1);
+    insertRandomNodeDepthFirst(root, 1);
     setUpdate((updateTrigger) => updateTrigger + 1);
   }, [root]);
 
@@ -115,6 +115,12 @@ export const Example0 = () => {
 
 function deleteRandomNode(root: Node, num: number) {
   while (num > 0 && root.children.length > 0) {
+    let candidates: {
+      node: Node;
+      parent: Node;
+      i: number;
+      depth: number;
+    }[] = [];
     visit(root, (node, depth) => {
       if (num === 0) {
         return;
@@ -122,36 +128,75 @@ function deleteRandomNode(root: Node, num: number) {
 
       for (let i = 0; i < node.children.length; i++) {
         if (node.children[i].children.length === 0) {
-          node.children.splice(i, 1);
-          num--;
-          if (num === 0) {
-            break;
-          }
+          candidates.push({
+            node: node.children[i],
+            parent: node,
+            i,
+            depth: depth + 1,
+          });
+          break;
         }
       }
     });
+
+    candidates.sort((a, b) => a.depth - b.depth);
+    candidates = candidates.slice(-num);
+    for (const { parent, i } of candidates) {
+      parent.children.splice(i, 1);
+      num--;
+      if (num === 0) {
+        break;
+      }
+    }
   }
 }
 
-function insertRandomNode(root: Node, num: number = 1) {
+function insertRandomNodeDepthFirst(root: Node, num: number = 1) {
   let nodes: [Node, number][] = [];
   visit(root, (node, depth) => {
-    if (node.children.length < 4) {
-      nodes.push([node, depth]);
-    }
+    nodes.push([node, depth]);
   });
 
-  nodes.sort((a, b) => -a[1] + b[1]);
-  if (nodes.length > 20) {
-    const depth = nodes[20][1];
-    nodes = nodes.filter(([_, d]) => d >= depth);
+  function filter() {
+    nodes.sort((a, b) => Math.random() * 2 - 1);
+    nodes.sort((a, b) => -a[1] + b[1]);
+    nodes = nodes.filter(([node, d]) => node.children.length < 4);
+    nodes = nodes.slice(0, 20).concat(nodes.filter(([node, d]) => d < 2));
   }
+
+  filter();
   for (let i = 0; i < num; i++) {
     const [node, d] = nodes[(Math.random() * nodes.length) | 0];
     const child = createNode();
     child.parentId = node.id;
     node.children.push(child);
     nodes.push([child, d + 1]);
+    if (nodes.length % 40 === 0) {
+      filter();
+    }
+  }
+}
+
+function insertRandomNodeBreadthFirst(root: Node, num: number = 1) {
+  let nodes: [Node, number][] = [];
+  visit(root, (node, depth) => {
+    nodes.push([node, depth]);
+  });
+
+  nodes.sort((a, b) => a[1] - b[1]);
+  nodes = nodes.filter(([node, d]) => node.children.length < 5);
+  nodes = nodes.slice(0, 40);
+  for (let i = 0; i < num; i++) {
+    const [node, d] = nodes[(Math.random() * nodes.length) | 0];
+    const child = createNode();
+    child.parentId = node.id;
+    node.children.push(child);
+    nodes.push([child, d + 1]);
+    if (nodes.length === 80) {
+      nodes.sort((a, b) => a[1] - b[1]);
+      nodes = nodes.filter(([node, d]) => node.children.length < 5);
+      nodes = nodes.slice(0, 40);
+    }
   }
 }
 

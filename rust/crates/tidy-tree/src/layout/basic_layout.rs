@@ -54,6 +54,14 @@ impl Layout for BasicLayout {
     fn partial_layout(&mut self, root: &mut Node, changed: &[std::ptr::NonNull<Node>]) {
         todo!()
     }
+
+    fn parent_child_margin(&self) -> Coord {
+        self.parent_child_margin
+    }
+
+    fn peer_margin(&self) -> Coord {
+        self.peer_margin
+    }
 }
 
 impl BasicLayout {
