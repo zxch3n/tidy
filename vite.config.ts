@@ -27,11 +27,13 @@ export default defineConfig({
     }),
   ],
   build: {
+    lib: {
+      entry: path.resolve(__dirname, 'src/index.ts'),
+      name: 'tidy',
+      fileName: (format) => `tidy.${format}.js`,
+    },
     rollupOptions: {
-      input: {
-        lib: path.resolve(__dirname, 'src/main.tsx'),
-        wasm: path.resolve(__dirname, 'wasm_dist/wasm.js'),
-      },
+      external: ['react'],
     },
   },
   // @ts-ignore

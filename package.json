@@ -1,17 +1,23 @@
 {
-  "name": "ts-parallel-template",
+  "name": "@zxch3n/tidy",
   "sideEffects": false,
   "version": "0.0.1",
   "description": "",
-  "module": "module/index.js",
-  "main": "lib/index.js",
+  "main": "./dist/tidy.umd.js",
+  "module": "./dist/tidy.es.js",
   "types": "module/index.d.ts",
   "source": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/tidy.es.js",
+      "require": "./dist/tidy.umd.js"
+    }
+  },
   "scripts": {
     "start": "vite",
     "test": "vitest run",
     "build:wasm": "cd rust && make build",
-    "build": "npm run build:wasm && vite build",
+    "build": "npm run build:wasm && vite build && tsc --project ./tsconfig.type.json",
     "doc": "typedoc src/index.ts",
     "release": "yarn build && standard-version",
     "typecheck": "tsc --noEmit",
@@ -19,20 +25,22 @@
     "build-storybook": "build-storybook"
   },
   "keywords": [
-    "js",
-    "promise",
-    "typescript"
+    "tree",
+    "visualization",
+    "wasm",
+    "mindmap",
+    "rust"
   ],
-  "license": "ISC",
+  "license": "MIT",
   "author": "Zixuan Chen",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zxch3n/ts-boilerplate.git"
+    "url": "git+https://github.com/zxch3n/tidy.git"
   },
   "bugs": {
-    "url": "https://github.com/zxch3n/ts-boilerplate/issues"
+    "url": "https://github.com/zxch3n/tidy/issues"
   },
-  "homepage": "https://github.com/zxch3n/ts-boilerplate#readme",
+  "homepage": "https://github.com/zxch3n/tidy#readme",
   "devDependencies": {
     "@babel/core": "^7.18.2",
     "@storybook/addon-actions": "^6.5.9",

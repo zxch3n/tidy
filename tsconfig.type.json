@@ -18,7 +18,9 @@
     "downlevelIteration": true,
     "rootDir": "./src",
     "preserveSymlinks": true,
-    "outDir": "lib/"
+    "outDir": "dist/",
+    "declaration": true,
+    "emitDeclarationOnly": true
   },
-  "include": ["src", "./comlink.d.ts", "deno/run.deno.ts"]
+  "include": ["src/index.ts"]
 }
