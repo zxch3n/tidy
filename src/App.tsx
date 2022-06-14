@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { TidyLayout } from './tidy';
+import { LayeredVsNonLayered } from './stories/LayeredVsNonLayered';
 
 function App() {
   const [count, setCount] = useState(0);
@@ -11,6 +11,7 @@ function App() {
 
   return (
     <div className="App">
+      <LayeredVsNonLayered />
       <header className="App-header">
         <p>Hello Vite + React!</p>
         <p>

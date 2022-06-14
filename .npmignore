@@ -6,3 +6,5 @@ docs/
 jest.config.js
 coverage/
 deno_lib/
+rust/
+.storybook/

@@ -1,46 +1,38 @@
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react';
-import { useDebounce } from 'react-use';
-import { Node } from '../tidy';
+import React, { useEffect, useState } from 'react';
 import { LayoutTypeStr, TidyComponent } from '../TidyComponent';
+import { Node } from '../tidy';
+import { Col, Row, Select, Slider, InputNumber } from 'antd';
 import { createNode, createTree, visit } from '../utils';
+import { useDebounce } from 'react-use';
 
-export default {
-  title: 'Tidy',
-  component: TidyComponent,
-  argTypes: {
-    layoutType: {
-      options: [
-        LayoutTypeStr.Tidy,
-        LayoutTypeStr.Basic,
-        LayoutTypeStr.LayeredTidy,
-      ],
-      defaultValue: LayoutTypeStr.Tidy,
-    },
-  },
-};
+const { Option } = Select;
+const root = createTree(50);
 
-interface Props {
-  layoutType: LayoutTypeStr;
-}
-/**
- * Primary UI component for user interaction
- */
-export const TidyLayout = ({
-  layoutType,
-  num,
+function Label({
+  style,
   ...props
-}: Props & { num: number }) => {
+}: {
+  style?: React.CSSProperties;
+  children?: any;
+}) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        width: 120,
+        padding: 4,
+        ...style,
+      }}
+      {...props}
+    />
+  );
+}
+
+export function TidyExample() {
+  const [layoutType, setLayoutType] = useState(LayoutTypeStr.Tidy);
   const [updateTrigger, setUpdate] = useState(0);
-  const [root, setRoot] = useState(() => {
-    return createTree(1);
-  });
-  const prevNum = useRef(1);
+  const [num, setNum] = useState(50);
   useDebounce(
     () => {
       let currentNum = nodeNum(root);
@@ -51,74 +43,56 @@ export const TidyLayout = ({
       }
 
       setUpdate((updateTrigger) => updateTrigger + 1);
-      prevNum.current = num;
     },
     100,
     [num],
   );
-  const addNode = useCallback(() => {
-    insertRandomNodeDepthFirst(root, 1);
-    setUpdate((updateTrigger) => updateTrigger + 1);
-  }, [root]);
-
   return (
-    <div onClick={addNode} style={{ display: 'flex', height: 800 }}>
+    <div style={{ height: 500 }}>
       <TidyComponent
         root={root}
         updateTrigger={updateTrigger}
         layoutType={layoutType}
       />
+      <div style={{ display: 'flex', marginBottom: 12 }}>
+        <Label>Layout Type:</Label>
+        <Select
+          value={layoutType}
+          onChange={(v) => setLayoutType(v)}
+          style={{ width: 150 }}
+        >
+          <Option value={LayoutTypeStr.Tidy}>Tidy</Option>
+          <Option value={LayoutTypeStr.LayeredTidy}>Layered Tidy</Option>
+          <Option value={LayoutTypeStr.Basic}>Naive</Option>
+        </Select>
+      </div>
+
+      <div style={{ display: 'flex' }}>
+        <InputNumber
+          value={num}
+          min={10}
+          max={1000}
+          onChange={(v) => setNum(v)}
+          addonAfter="Nodes"
+          style={{ width: 140 }}
+        />
+        <Slider
+          value={num}
+          onChange={(v) => setNum(v)}
+          min={10}
+          max={1000}
+          style={{ width: 300 }}
+        />
+      </div>
     </div>
   );
-};
-
-TidyLayout.argTypes = {
-  num: {
-    control: { type: 'range', min: 0, max: 400 },
-    defaultValue: 200,
-  },
-};
-
-export const Example0 = () => {
-  return (
-    <TidyComponent
-      root={node(10, 10, [
-        node(10, 10, [
-          node(10, 10, [
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-          ]),
-        ]),
-        node(10, 10, [node(10, 10), node(10, 10), node(10, 10), node(10, 10)]),
-        node(10, 10),
-        node(10, 40),
-      ])}
-      updateTrigger={0}
-      layoutType={LayoutTypeStr.Tidy}
-    />
-  );
-};
+}
 
 function deleteRandomNode(root: Node, num: number) {
   while (num > 0 && root.children.length > 0) {
     let candidates: {
       node: Node;
       parent: Node;
-      i: number;
       depth: number;
     }[] = [];
     visit(root, (node, depth) => {
@@ -127,24 +101,20 @@ function deleteRandomNode(root: Node, num: number) {
       }
 
       for (let i = 0; i < node.children.length; i++) {
-        if (node.children[i].children.length === 0) {
-          candidates.push({
-            node: node.children[i],
-            parent: node,
-            i,
-            depth: depth + 1,
-          });
-          break;
-        }
+        candidates.push({
+          node: node.children[i],
+          parent: node,
+          depth: depth + 1,
+        });
       }
     });
 
     candidates.sort((a, b) => a.depth - b.depth);
     candidates = candidates.slice(-num);
-    for (const { parent, i } of candidates) {
-      parent.children.splice(i, 1);
-      num--;
-      if (num === 0) {
+    for (const { parent, node } of candidates) {
+      parent.children.splice(parent.children.indexOf(node), 1);
+      num -= nodeNum(node);
+      if (num <= 0) {
         break;
       }
     }

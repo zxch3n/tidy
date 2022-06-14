@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useRef } from 'react';
 
 import { Renderer } from './renderer';
 import { LayoutType, Node, TidyLayout } from './tidy';
@@ -13,6 +13,7 @@ interface Props {
   root: Node;
   layoutType?: LayoutTypeStr;
   updateTrigger?: number;
+  style?: React.CSSProperties;
 }
 
 function getLayoutType(type?: LayoutTypeStr) {
@@ -32,7 +33,12 @@ function getLayoutType(type?: LayoutTypeStr) {
   }
 }
 
-export const TidyComponent = ({ root, layoutType, updateTrigger }: Props) => {
+export const TidyComponent = ({
+  root,
+  layoutType,
+  updateTrigger,
+  style,
+}: Props) => {
   const renderRef = useRef<Renderer>();
   const containerRef = useRef<HTMLDivElement>(null);
   const layoutRef = useRef<TidyLayout>();
@@ -75,5 +81,10 @@ export const TidyComponent = ({ root, layoutType, updateTrigger }: Props) => {
     };
   }, []);
 
-  return <div ref={containerRef} style={{ width: '100%', minHeight: 500 }} />;
+  return (
+    <div
+      ref={containerRef}
+      style={{ width: '100%', height: '100%', ...style }}
+    />
+  );
 };
