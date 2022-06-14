@@ -5,7 +5,7 @@
   "description": "",
   "main": "./dist/tidy.umd.js",
   "module": "./dist/tidy.es.js",
-  "types": "module/index.d.ts",
+  "types": "./dist/index.d.ts",
   "source": "./src/index.ts",
   "exports": {
     ".": {
