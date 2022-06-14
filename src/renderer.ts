@@ -6,10 +6,20 @@ import {
   BezierCurve,
   Group,
   BezierCurveShape,
+  registerPainter,
 } from 'zrender';
+import CanvasPainter from 'zrender/lib/canvas/Painter';
 import { Disposable } from './dispose';
 import { InnerNode } from './tidy';
 import { visit } from './utils';
+
+registerPainter('canvas', CanvasPainter);
+export interface ThemeProps {
+  dark?: boolean;
+  lineColor?: string;
+  blockColor?: string;
+  borderColor?: string;
+}
 
 export class Renderer extends Disposable {
   private render: ZRenderType;
@@ -21,7 +31,7 @@ export class Renderer extends Disposable {
     new Map();
   private lineTargetMap: Map<number, { line: BezierCurve; id: number }[]> =
     new Map();
-  constructor(container: HTMLElement) {
+  constructor(container: HTMLElement, private theme: ThemeProps = {}) {
     super();
     this.render = init(container);
     this._register({
@@ -29,6 +39,16 @@ export class Renderer extends Disposable {
         dispose(this.render);
       },
     });
+
+    if (theme.dark) {
+      theme.blockColor = theme.blockColor ?? '#4a4bd2';
+      theme.lineColor = theme.lineColor ?? '#eee';
+      theme.borderColor = theme.borderColor ?? '#eee';
+    } else {
+      theme.blockColor = theme.blockColor ?? '#5d72b1';
+      theme.lineColor = theme.lineColor ?? '#a8bbf0';
+      theme.borderColor = theme.borderColor ?? '#5d72b1';
+    }
   }
 
   init(root: InnerNode) {
@@ -44,7 +64,6 @@ export class Renderer extends Disposable {
   }
 
   clear() {
-    console.log('CLEAR', this.group, this.rectMap.size);
     this.render.clear();
     if (this.group) {
       this.group.removeAll();
@@ -82,8 +101,8 @@ export class Renderer extends Disposable {
         r: 4,
       },
       style: {
-        stroke: '#2b5de9',
-        fill: '#a8bbf0',
+        stroke: this.theme.borderColor,
+        fill: this.theme.blockColor,
       },
     });
     this.rectMap.set(node.id, rect);
@@ -103,7 +122,7 @@ export class Renderer extends Disposable {
     const line = new BezierCurve({
       shape: getBezierCurveShape(node, child),
       style: {
-        stroke: '#2b5de9',
+        stroke: this.theme.lineColor,
       },
     });
 

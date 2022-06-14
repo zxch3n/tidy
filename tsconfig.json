@@ -14,7 +14,7 @@
     "isolatedModules": true,
     "strictNullChecks": true,
     "noEmit": false,
-    "jsx": "react",
+    "jsx": "preserve",
     "downlevelIteration": true,
     "rootDir": "./src",
     "preserveSymlinks": true,

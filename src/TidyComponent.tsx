@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef } from 'react';
 
-import { Renderer } from './renderer';
+import { Renderer, ThemeProps } from './renderer';
 import { LayoutType, Node, TidyLayout } from './tidy';
 
 export enum LayoutTypeStr {
@@ -14,6 +14,7 @@ interface Props {
   layoutType?: LayoutTypeStr;
   updateTrigger?: number;
   style?: React.CSSProperties;
+  theme?: ThemeProps;
 }
 
 function getLayoutType(type?: LayoutTypeStr) {
@@ -37,13 +38,13 @@ export const TidyComponent = ({
   root,
   layoutType,
   updateTrigger,
+  theme,
   style,
 }: Props) => {
   const renderRef = useRef<Renderer>();
   const containerRef = useRef<HTMLDivElement>(null);
   const layoutRef = useRef<TidyLayout>();
   const type = getLayoutType(layoutType);
-  console.log(root);
   useLayoutEffect(() => {
     if (!layoutRef.current || !renderRef.current) {
       return;
@@ -56,7 +57,7 @@ export const TidyComponent = ({
   useLayoutEffect(() => {
     let done = false;
     const func = async () => {
-      renderRef.current = new Renderer(containerRef.current!);
+      renderRef.current = new Renderer(containerRef.current!, theme);
       layoutRef.current = await TidyLayout.create(type);
       if (done) {
         return;

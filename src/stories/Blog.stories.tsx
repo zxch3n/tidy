@@ -1,12 +1,5 @@
 import { Row, Switch, Button } from 'antd';
-import {
-  SVGProps,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { SVGProps, useEffect, useRef, useState } from 'react';
 import { Renderer } from '../renderer';
 import { InnerNode, Node } from '../tidy';
 import { LayoutTypeStr, TidyComponent } from '../TidyComponent';
@@ -275,7 +268,7 @@ function Tree({ root }: { root: InnerNode }) {
   );
 }
 
-export function MaterialSymbolsRefreshRounded(props: SVGProps<SVGSVGElement>) {
+function MaterialSymbolsRefreshRounded(props: SVGProps<SVGSVGElement>) {
   return (
     <svg width="1em" height="1em" viewBox="0 0 24 24" {...props}>
       <path

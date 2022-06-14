@@ -83,26 +83,7 @@ export class TidyLayout extends Disposable {
 
   layout(updated = false) {
     if (updated) {
-      const removedNodeId = new Set(this.idToNode.keys());
-      visit(this.root!, (node) => {
-        removedNodeId.delete(node.id);
-        if (this.idToNode.has(node.id)) {
-          return;
-        }
-
-        this.idToNode.set(node.id, node);
-        this.tidy.add_node(
-          node.id,
-          node.width,
-          node.height,
-          node.parentId ?? NULL_ID(),
-        );
-      });
-
-      for (const nodeId of removedNodeId) {
-        this.tidy.remove_node(nodeId);
-        this.idToNode.delete(nodeId);
-      }
+      this.update();
     }
 
     this.tidy.layout();
@@ -112,6 +93,29 @@ export class TidyLayout extends Disposable {
       const node = this.idToNode.get(id)!;
       node.x = positions[i + 1];
       node.y = positions[i + 2];
+    }
+  }
+
+  update() {
+    const removedNodeId = new Set(this.idToNode.keys());
+    visit(this.root!, (node) => {
+      removedNodeId.delete(node.id);
+      if (this.idToNode.has(node.id)) {
+        return;
+      }
+
+      this.idToNode.set(node.id, node);
+      this.tidy.add_node(
+        node.id,
+        node.width,
+        node.height,
+        node.parentId ?? NULL_ID(),
+      );
+    });
+
+    for (const nodeId of removedNodeId) {
+      this.tidy.remove_node(nodeId);
+      this.idToNode.delete(nodeId);
     }
   }
 

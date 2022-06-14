@@ -8,7 +8,14 @@ import React, {
 import { useDebounce } from 'react-use';
 import { Node } from '../tidy';
 import { LayoutTypeStr, TidyComponent } from '../TidyComponent';
-import { createNode, createTree, visit } from '../utils';
+import {
+  createNode,
+  createTree,
+  insertRandomNodeDepthFirst,
+  node,
+  nodeNum,
+  visit,
+} from '../utils';
 
 export default {
   title: 'Tidy',
@@ -132,69 +139,4 @@ function deleteRandomNode(root: Node, num: number) {
       }
     }
   }
-}
-
-function insertRandomNodeDepthFirst(root: Node, num: number = 1) {
-  let nodes: [Node, number][] = [];
-  visit(root, (node, depth) => {
-    nodes.push([node, depth]);
-  });
-
-  function filter() {
-    nodes.sort((a, b) => Math.random() * 2 - 1);
-    nodes.sort((a, b) => -a[1] + b[1]);
-    nodes = nodes.filter(([node, d]) => node.children.length < 4);
-    nodes = nodes.slice(0, 20).concat(nodes.filter(([node, d]) => d < 2));
-  }
-
-  filter();
-  for (let i = 0; i < num; i++) {
-    const [node, d] = nodes[(Math.random() * nodes.length) | 0];
-    const child = createNode();
-    child.parentId = node.id;
-    node.children.push(child);
-    nodes.push([child, d + 1]);
-    if (nodes.length % 40 === 0) {
-      filter();
-    }
-  }
-}
-
-function insertRandomNodeBreadthFirst(root: Node, num: number = 1) {
-  let nodes: [Node, number][] = [];
-  visit(root, (node, depth) => {
-    nodes.push([node, depth]);
-  });
-
-  nodes.sort((a, b) => a[1] - b[1]);
-  nodes = nodes.filter(([node, d]) => node.children.length < 5);
-  nodes = nodes.slice(0, 40);
-  for (let i = 0; i < num; i++) {
-    const [node, d] = nodes[(Math.random() * nodes.length) | 0];
-    const child = createNode();
-    child.parentId = node.id;
-    node.children.push(child);
-    nodes.push([child, d + 1]);
-    if (nodes.length === 80) {
-      nodes.sort((a, b) => a[1] - b[1]);
-      nodes = nodes.filter(([node, d]) => node.children.length < 5);
-      nodes = nodes.slice(0, 40);
-    }
-  }
-}
-
-function node(width: number, height: number, children: Node[] = []): Node {
-  return {
-    x: 0,
-    y: 0,
-    width,
-    height,
-    children,
-  };
-}
-
-function nodeNum(root: Node) {
-  let count = 0;
-  visit(root, () => count++);
-  return count;
 }

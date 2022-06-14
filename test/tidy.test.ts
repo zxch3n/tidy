@@ -1,6 +1,6 @@
 import { TidyLayout, initWasm, LayoutType } from '../src/tidy';
 import { beforeAll, expect, describe, it } from 'vitest';
-import { createTree } from '../src/utils';
+import { createTree, insertRandomNodeBreadthFirst } from '../src/utils';
 import { readFile } from 'fs/promises';
 import { debugStrToTree } from '../src/stories/debugToTree';
 import * as path from 'path';
@@ -30,24 +30,46 @@ describe('tidy', () => {
    */
   it('benchmark tidy', async () => {
     const tidy = await TidyLayout.create(LayoutType.Tidy);
-    const root = createTree(100_000);
+    const root = createTree(1_000);
     tidy.set_root(root);
-    const start = performance.now();
-    for (let i = 0; i < 20; i++) {
+
+    const perf: { duration: number; num: number }[] = [];
+    for (let i = 0; i < 10; i++) {
       tidy.layout();
     }
-    console.log('tidy layout speed', (performance.now() - start) / 20);
+
+    for (let num = 1000; num < 110_000; num += 1000) {
+      tidy.update();
+      const start = performance.now();
+      tidy.layout();
+      const duration = performance.now() - start;
+      perf.push({ duration, num });
+      insertRandomNodeBreadthFirst(root, 1000);
+    }
+
+    console.log(JSON.stringify(perf, undefined, 2));
   });
 
   it('benchmark naive', async () => {
     const tidy = await TidyLayout.create(LayoutType.Basic);
-    const root = createTree(100_000);
+    const root = createTree(1_000);
     tidy.set_root(root);
-    const start = performance.now();
-    for (let i = 0; i < 20; i++) {
+
+    const perf: { duration: number; num: number }[] = [];
+    for (let i = 0; i < 10; i++) {
       tidy.layout();
     }
-    console.log('naive layout speed', (performance.now() - start) / 20);
+
+    for (let num = 1000; num < 110_000; num += 1000) {
+      tidy.update();
+      const start = performance.now();
+      tidy.layout();
+      const duration = performance.now() - start;
+      perf.push({ duration, num });
+      insertRandomNodeBreadthFirst(root, 1000);
+    }
+
+    console.log(JSON.stringify(perf, undefined, 2));
   });
 
   it('debug', () => {

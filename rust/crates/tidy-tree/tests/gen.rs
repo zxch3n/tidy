@@ -22,13 +22,8 @@ pub fn gen_node(rng: &mut StdRng) -> Node {
 pub fn gen_tree(rng: &mut StdRng, num: usize) -> Node {
     let root = gen_node(rng);
     let mut nodes: Vec<NonNull<Node>> = vec![(&root).into()];
-    let max_chosen_size = 1000000;
     for _ in 0..num {
-        let parent_index = if nodes.len() < max_chosen_size {
-            rng.gen_range(0..nodes.len())
-        } else {
-            rng.gen_range((nodes.len() - max_chosen_size)..nodes.len())
-        };
+        let parent_index = rng.gen_range(0..nodes.len());
         let parent = unsafe { nodes[parent_index].as_mut() };
         let node = gen_node(rng);
         parent.append_child(node);
