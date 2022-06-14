@@ -1,11 +1,17 @@
-# ts-rust-boilerplate
+# Tidy Tree Visualization
 
-[![codecov](https://codecov.io/gh/zxch3n/ts-boilerplate/branch/master/graph/badge.svg)](https://codecov.io/gh/zxch3n/ts-boilerplate)
 
-This template is used to build library that will be published to npm and deno.land.
+![Show Case](https://i.ibb.co/hM6mnZS/202206150143.gif)
 
-# Usage
+[See Introduction Blog](https://zxch3n.com/tidy/tidy/)
 
-1. Press `Use this template` to create your project
-2. Clone from your repo
-3. Run `node scripts/init.js` to update `package.json` and `README.md`
+
+![Benchmark](https://i.ibb.co/3k4brBD/benchmark.png)
+
+
+
+The layout algorithm is based on paper *"Drawing non-layered tidy trees in linear time"*.
+
+```
+A. van der Ploeg, “Drawing non-layered tidy trees in linear time,”Software: Practice and Experience, vol. 44, no. 12, pp. 1467–1484, 2014, doi: 10.1002/spe.2213.
+```
