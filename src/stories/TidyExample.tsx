@@ -4,6 +4,7 @@ import { Node } from '../tidy';
 import { Col, Row, Select, Slider, InputNumber } from 'antd';
 import { createNode, createTree, visit } from '../utils';
 import { useDebounce } from 'react-use';
+import { Card } from './LayeredVsNonLayered';
 
 const { Option } = Select;
 const root = createTree(50);
@@ -48,14 +49,14 @@ export function TidyExample() {
     [num],
   );
   return (
-    <div style={{ height: 500 }}>
+    <Card style={{ padding: 16 }}>
       <TidyComponent
         root={root}
         updateTrigger={updateTrigger}
         layoutType={layoutType}
       />
-      <div style={{ display: 'flex', marginBottom: 12 }}>
-        <Label>Layout Type:</Label>
+      <div style={{ display: 'flex', marginBottom: 12, width: 400 }}>
+        <Label style={{ width: 140 }}>Layout Type:</Label>
         <Select
           value={layoutType}
           onChange={(v) => setLayoutType(v)}
@@ -67,14 +68,14 @@ export function TidyExample() {
         </Select>
       </div>
 
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', width: 400 }}>
         <InputNumber
           value={num}
           min={10}
           max={1000}
           onChange={(v) => setNum(v)}
           addonAfter="Nodes"
-          style={{ width: 140 }}
+          style={{ width: 140, marginRight: 20 }}
         />
         <Slider
           value={num}
@@ -84,7 +85,7 @@ export function TidyExample() {
           style={{ width: 300 }}
         />
       </div>
-    </div>
+    </Card>
   );
 }
 

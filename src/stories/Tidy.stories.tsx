@@ -83,32 +83,15 @@ export const Example0 = () => {
   return (
     <TidyComponent
       root={node(10, 10, [
-        node(10, 10, [
-          node(10, 10, [
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-            node(10, 10),
-          ]),
-        ]),
-        node(10, 10, [node(10, 10), node(10, 10), node(10, 10), node(10, 10)]),
+        node(10, 10, [node(300, 10)]),
         node(10, 10),
-        node(10, 40),
+        node(10, 10),
+        node(10, 10),
+        // node(10, 80),
       ])}
       updateTrigger={0}
       layoutType={LayoutTypeStr.Tidy}
+      style={{ height: 500 }}
     />
   );
 };

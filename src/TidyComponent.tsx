@@ -43,6 +43,7 @@ export const TidyComponent = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const layoutRef = useRef<TidyLayout>();
   const type = getLayoutType(layoutType);
+  console.log(root);
   useLayoutEffect(() => {
     if (!layoutRef.current || !renderRef.current) {
       return;

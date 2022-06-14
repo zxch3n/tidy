@@ -407,7 +407,7 @@ const root = {
   parentId: 275765647,
 };
 
-function Card({ children, ...props }: any) {
+export function Card({ children, style, ...props }: any) {
   return (
     <Col
       lg={12}
@@ -422,10 +422,17 @@ function Card({ children, ...props }: any) {
           height: 500,
           border: '1px solid rgba(128,128,128,0.2)',
           borderRadius: 8,
+          ...style,
         }}
       >
         <div
-          style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+          style={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
         >
           {children}
         </div>
