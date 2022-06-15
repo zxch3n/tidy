@@ -4,12 +4,12 @@
   "version": "0.0.2",
   "description": "",
   "main": "./dist/tidy.umd.js",
-  "module": "./dist/tidy.es.js",
+  "module": "./dist/tidy.es.mjs",
   "types": "./dist/index.d.ts",
   "source": "./src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/tidy.es.js",
+      "import": "./dist/tidy.es.mjs",
       "require": "./dist/tidy.umd.js"
     }
   },

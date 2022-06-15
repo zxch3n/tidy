@@ -1,7 +1,8 @@
 import { TidyLayout, initWasm, LayoutType } from '../src/tidy';
 import { beforeAll, expect, describe, it } from 'vitest';
-import { createTree, insertRandomNodeBreadthFirst } from '../src/utils';
+import { createTree } from '../src/utils';
 import { readFile } from 'fs/promises';
+import { writeFileSync } from 'fs';
 import { debugStrToTree } from '../src/stories/debugToTree';
 import * as path from 'path';
 
@@ -23,53 +24,6 @@ describe('tidy', () => {
         root.children[i - 1].x - root.children[i - 1].width / 2,
       );
     }
-  });
-
-  /**
-   * it takes 20ms to layout 100k nodes
-   */
-  it('benchmark tidy', async () => {
-    const tidy = await TidyLayout.create(LayoutType.Tidy);
-    const root = createTree(1_000);
-    tidy.set_root(root);
-
-    const perf: { duration: number; num: number }[] = [];
-    for (let i = 0; i < 10; i++) {
-      tidy.layout();
-    }
-
-    for (let num = 1000; num < 110_000; num += 1000) {
-      tidy.update();
-      const start = performance.now();
-      tidy.layout();
-      const duration = performance.now() - start;
-      perf.push({ duration, num });
-      insertRandomNodeBreadthFirst(root, 1000);
-    }
-
-    console.log(JSON.stringify(perf, undefined, 2));
-  });
-
-  it('benchmark naive', async () => {
-    const tidy = await TidyLayout.create(LayoutType.Basic);
-    const root = createTree(1_000);
-    tidy.set_root(root);
-
-    const perf: { duration: number; num: number }[] = [];
-    for (let i = 0; i < 10; i++) {
-      tidy.layout();
-    }
-
-    for (let num = 1000; num < 110_000; num += 1000) {
-      tidy.update();
-      const start = performance.now();
-      tidy.layout();
-      const duration = performance.now() - start;
-      perf.push({ duration, num });
-      insertRandomNodeBreadthFirst(root, 1000);
-    }
-
-    console.log(JSON.stringify(perf, undefined, 2));
   });
 
   it('debug', () => {

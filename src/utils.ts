@@ -48,15 +48,9 @@ export function createNode(): Node {
 export function createTree(num: number): Node {
   const root = createNode();
   let arr = [root];
-  const MAX_CHOSEN_SIZE = 16;
   for (let i = 0; i < num; i++) {
     let parentIndex = 0;
-    if (arr.length < MAX_CHOSEN_SIZE) {
-      parentIndex = (arr.length * Math.random()) | 0;
-    } else {
-      parentIndex = (arr.length - 1 - MAX_CHOSEN_SIZE * Math.random()) | 0;
-    }
-
+    parentIndex = (arr.length * Math.random()) | 0;
     const parent = arr[parentIndex];
     const child = createNode();
     parent.children.push(child);
