@@ -6,10 +6,10 @@ import {
   initWasm,
   TidyLayout,
   LayoutType,
-  createTree,
+  createNode,
 } from '../dist/tidy.es.mjs';
 import { join, dirname } from 'path';
-import { writeFileSync, readFileSync } from 'fs';
+import { appendFileSync, readFileSync } from 'fs';
 import { fileURLToPath } from 'node:url';
 
 function gc() {
@@ -20,23 +20,15 @@ const filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(filename);
 initWasm(readFileSync(join(__dirname, '../wasm_dist/wasm_bg.wasm'))).then(main);
 async function bench(type) {
-  const tidy = await TidyLayout.create(type);
-  const root = createTree(1_000);
-  tidy.set_root(root);
-
+  const [root, arr] = insertNewNodes(0);
   const perf = [];
-  for (let i = 0; i < 10; i++) {
-    tidy.layout();
-  }
-
-  tidy.dispose();
   console.log('Benching for type:', LayoutType[type]);
-  for (let num = 1000; num < 110_000; num += 1000) {
+  for (let num = 1000; num < 500_000; num += 1000) {
     const tidy = await TidyLayout.create(type);
-    const root = createTree(num);
+    insertNewNodes(1000, root, arr);
     tidy.set_root(root);
     gc();
-    await new Promise((r) => setTimeout(r, 100));
+    await new Promise((r) => setTimeout(r, 0));
     const start = performance.now();
     tidy.layout();
     const duration = performance.now() - start;
@@ -44,6 +36,9 @@ async function bench(type) {
     tidy.dispose();
     gc();
     await new Promise((r) => setTimeout(r, 0));
+    if (num % 100_000 === 0) {
+      console.log(num);
+    }
   }
 
   let out = '';
@@ -52,16 +47,35 @@ async function bench(type) {
   }
 
   if (type === LayoutType.Tidy) {
-    writeFileSync(join(__dirname, 'tidy_wasm.log'), out);
+    appendFileSync(join(__dirname, 'tidy_wasm.log'), out, {});
   }
   if (type === LayoutType.Basic) {
-    writeFileSync(join(__dirname, 'naive_wasm.log'), out);
+    appendFileSync(join(__dirname, 'naive_wasm.log'), out);
   }
 }
 
+function insertNewNodes(num, root = createNode(), arr = [root]) {
+  for (let i = 0; i < num; i++) {
+    let parentIndex = 0;
+    parentIndex = (arr.length * Math.random()) | 0;
+    const parent = arr[parentIndex];
+    const child = createNode();
+    parent.children.push(child);
+    child.parentId = parent.id;
+    arr.push(child);
+  }
+
+  return [root, arr];
+}
+
 async function main() {
-  await bench(LayoutType.Tidy);
-  gc();
-  await new Promise((r) => setTimeout(r, 100));
-  await bench(LayoutType.Basic);
+  for (let i = 0; i < 100; i++) {
+    console.log(i);
+    await bench(LayoutType.Tidy);
+    gc();
+    await new Promise((r) => setTimeout(r, 1000));
+    await bench(LayoutType.Basic);
+    gc();
+    await new Promise((r) => setTimeout(r, 1000));
+  }
 }

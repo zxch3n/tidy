@@ -21,7 +21,6 @@ pub struct TidyData {
     pub shift_acceleration: Coord,
     /// Cached change of x position
     pub shift_change: Coord,
-    pub test: usize,
 
     /// this.x = parent.x + modifier_to_subtree
     pub modifier_to_subtree: Coord,

@@ -6,3 +6,5 @@ target/
 dist/
 wasm_dist/
 .cache/
+*.log
+.DS_Store

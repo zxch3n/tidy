@@ -68,13 +68,11 @@ impl Contour {
 
     pub fn left(&self) -> Coord {
         let node = self.node();
-        assert_eq!(node.tidy().test, TEST);
         self.modifier_sum + node.relative_x - node.width / 2.
     }
 
     pub fn right(&self) -> Coord {
         let node = self.node();
-        assert_eq!(node.tidy().test, TEST);
         self.modifier_sum + node.relative_x + node.width / 2.
     }
 
@@ -91,7 +89,6 @@ impl Contour {
     pub fn next(&mut self) {
         if let Some(mut current) = self.current {
             let node = unsafe { current.as_mut() };
-            assert_eq!(node.tidy().test, TEST);
             if self.is_left {
                 if node.children.len() > 0 {
                     self.current = Some((&**node.children.first().unwrap()).into());
@@ -113,7 +110,6 @@ impl Contour {
             }
             if self.current.is_some() {
                 let node = self.node();
-                assert_eq!(node.tidy().test, TEST);
             }
         }
     }
@@ -470,20 +466,35 @@ impl Layout for TidyLayout {
 }
 
 fn init_node(node: &mut Node) {
-    node.tidy = Some(Box::new(TidyData {
-        extreme_left: None,
-        extreme_right: None,
-        shift_acceleration: 0.,
-        shift_change: 0.,
-        modifier_to_subtree: 0.,
-        modifier_extreme_left: 0.,
-        modifier_extreme_right: 0.,
-        thread_left: None,
-        thread_right: None,
-        modifier_thread_left: 0.,
-        modifier_thread_right: 0.,
-        test: TEST,
-    }));
+    if node.tidy.is_some() {
+        let tidy = node.tidy_mut();
+        tidy.extreme_left = None;
+        tidy.extreme_right = None;
+        tidy.shift_acceleration = 0.;
+        tidy.shift_change = 0.;
+        tidy.modifier_to_subtree = 0.;
+        tidy.modifier_extreme_left = 0.;
+        tidy.modifier_extreme_right = 0.;
+        tidy.thread_left = None;
+        tidy.thread_right = None;
+        tidy.modifier_thread_left = 0.;
+        tidy.modifier_thread_right = 0.;
+    } else {
+        node.tidy = Some(Box::new(TidyData {
+            extreme_left: None,
+            extreme_right: None,
+            shift_acceleration: 0.,
+            shift_change: 0.,
+            modifier_to_subtree: 0.,
+            modifier_extreme_left: 0.,
+            modifier_extreme_right: 0.,
+            thread_left: None,
+            thread_right: None,
+            modifier_thread_left: 0.,
+            modifier_thread_right: 0.,
+        }));
+    }
+
     node.x = 0.;
     node.y = 0.;
     node.relative_x = 0.;

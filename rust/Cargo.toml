@@ -5,15 +5,9 @@ members = ["crates/*"]
 #debug = true
 lto = true
 #opt-level = "s"
-codegen-units = 1
 #panic = "abort"
 
 # [profile.release.package.wasm]
 # opt-level = 3
 #opt-level = "s"
 #debugging = true
-
-[profile.bench]
-opt-level = 3
-debug-assertions = false
-debug = false

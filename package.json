@@ -22,7 +22,8 @@
     "release": "yarn build && standard-version",
     "typecheck": "tsc --noEmit",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "bench:wasm": "node --expose-gc test/benchmark.mjs"
   },
   "keywords": [
     "tree",
