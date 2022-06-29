@@ -6,6 +6,8 @@
 
 ![](https://i.ibb.co/nbhZSQ7/image.png)
 
+Tidy is designed specifically for tree layout. Graph and DAG data are not supported.
+
 The layout algorithm is based on paper _"Drawing non-layered tidy trees in linear time"_.
 
 ```
