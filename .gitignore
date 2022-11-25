@@ -5,6 +5,8 @@ coverage/
 target/
 dist/
 wasm_dist/
+docs/
+storybook-static/
 .cache/
 *.log
 .DS_Store
