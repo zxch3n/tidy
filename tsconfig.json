@@ -13,12 +13,11 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "strictNullChecks": true,
-    "noEmit": false,
-    "jsx": "preserve",
+    "noEmit": true,
+    "jsx": "react-jsx",
     "downlevelIteration": true,
     "rootDir": "./src",
-    "preserveSymlinks": true,
-    "outDir": "lib/"
+    "preserveSymlinks": true
   },
   "include": ["src"]
 }
