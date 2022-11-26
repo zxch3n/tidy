@@ -29,6 +29,7 @@ function linesToNode(lines: { line: string; indent: number }[]): InnerNode {
 
 function lineToNode(line: string): InnerNode {
   const ans = line.match(
+    // eslint-disable-next-line no-useless-escape
     /x: ([-\d\.]+), y: ([-\d\.]+), width: ([\d\.]+), height: ([\d\.]+)/,
   )!;
   return {
