@@ -50,7 +50,7 @@ export const TidyLayout = ({
   const prevNum = useRef(1);
   useDebounce(
     () => {
-      let currentNum = nodeNum(root);
+      const currentNum = nodeNum(root);
       if (num < currentNum) {
         deleteRandomNode(root, currentNum - num);
       } else if (num > currentNum) {

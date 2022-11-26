@@ -41,7 +41,7 @@ export function TidyExample() {
   const [num, setNum] = useState(50);
   useDebounce(
     () => {
-      let currentNum = nodeNum(root);
+      const currentNum = nodeNum(root);
       if (num < currentNum) {
         deleteRandomNode(root, currentNum - num);
       } else if (num > currentNum) {

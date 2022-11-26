@@ -47,7 +47,7 @@ export function createNode(): Node {
 
 export function createTree(num: number): Node {
   const root = createNode();
-  let arr = [root];
+  const arr = [root];
   for (let i = 0; i < num; i++) {
     let parentIndex = 0;
     parentIndex = (arr.length * Math.random()) | 0;
