@@ -4,7 +4,10 @@
   "version": "0.0.2",
   "description": "",
   "type": "module",
-  "files": ["dist/**/*", "wasm_dist/**/*"],
+  "files": [
+    "dist/**/*",
+    "wasm_dist/**/*"
+  ],
   "main": "./dist/tidy.js",
   "module": "./dist/tidy.js",
   "types": "./dist/index.d.ts",
@@ -27,9 +30,16 @@
     "typecheck": "tsc",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "bench:wasm": "node --expose-gc test/benchmark.mjs"
+    "bench:wasm": "node --expose-gc test/benchmark.mjs",
+    "format": "prettier --write ."
   },
-  "keywords": ["tree", "visualization", "wasm", "mindmap", "rust"],
+  "keywords": [
+    "tree",
+    "visualization",
+    "wasm",
+    "mindmap",
+    "rust"
+  ],
   "license": "MIT",
   "author": "Zixuan Chen",
   "repository": {
