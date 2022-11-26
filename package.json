@@ -3,14 +3,15 @@
   "sideEffects": false,
   "version": "0.0.2",
   "description": "",
-  "main": "./dist/tidy.umd.js",
-  "module": "./dist/tidy.es.mjs",
+  "type": "module",
+  "files": ["dist/**/*", "wasm_dist/**/*"],
+  "main": "./dist/tidy.js",
+  "module": "./dist/tidy.js",
   "types": "./dist/index.d.ts",
   "source": "./src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/tidy.es.mjs",
-      "require": "./dist/tidy.umd.js"
+      "import": "./dist/tidy.js"
     }
   },
   "scripts": {
@@ -25,13 +26,7 @@
     "build-storybook": "build-storybook",
     "bench:wasm": "node --expose-gc test/benchmark.mjs"
   },
-  "keywords": [
-    "tree",
-    "visualization",
-    "wasm",
-    "mindmap",
-    "rust"
-  ],
+  "keywords": ["tree", "visualization", "wasm", "mindmap", "rust"],
   "license": "MIT",
   "author": "Zixuan Chen",
   "repository": {
