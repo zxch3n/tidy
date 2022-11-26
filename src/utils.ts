@@ -94,7 +94,7 @@ export function deleteRandomNode(root: Node, num: number) {
   }
 }
 
-export function insertRandomNodeDepthFirst(root: Node, num: number = 1) {
+export function insertRandomNodeDepthFirst(root: Node, num = 1) {
   let nodes: [Node, number][] = [];
   visit(root, (node, depth) => {
     nodes.push([node, depth]);
@@ -120,8 +120,8 @@ export function insertRandomNodeDepthFirst(root: Node, num: number = 1) {
   }
 }
 
-export function insertRandomNodeBreadthFirst(root: Node, num: number = 1) {
-  let nodes: [Node, number][] = [];
+export function insertRandomNodeBreadthFirst(root: Node, num = 1) {
+  const nodes: [Node, number][] = [];
   visit(root, (node, depth) => {
     nodes.push([node, depth]);
   });
