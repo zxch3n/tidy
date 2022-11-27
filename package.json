@@ -9,6 +9,9 @@
   "module": "./dist/tidy.js",
   "types": "./dist/index.d.ts",
   "source": "./src/index.ts",
+  "engines": {
+    "node": "^18.12.1"
+  },
   "exports": {
     ".": {
       "import": "./dist/tidy.js"
