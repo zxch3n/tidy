@@ -8,6 +8,7 @@ function linesToNode(lines: { line: string; indent: number }[]): InnerNode {
   const currentIndent = lines[0].indent;
   const node = lineToNode(lines[0].line);
   for (let i = 1; i < lines.length; i++) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { line, indent } = lines[i];
     if (indent === currentIndent + 1) {
       const start = i;
