@@ -18,7 +18,10 @@ export default defineConfig({
   plugins: [
     checker({
       typescript: {
-        buildMode: true
+        buildMode: true,
+      },
+      eslint: {
+        lintCommand: 'eslint .',
       },
     }),
     react(),
