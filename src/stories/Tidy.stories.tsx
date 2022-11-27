@@ -37,7 +37,7 @@ export const TidyLayout = ({
   ...props
 }: Props & { num: number }) => {
   const [updateTrigger, setUpdate] = useState(0);
-  const [root, setRoot] = useState(() => {
+  const [root] = useState(() => {
     return createTree(1);
   });
   const prevNum = useRef(1);
