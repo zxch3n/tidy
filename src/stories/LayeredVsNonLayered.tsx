@@ -1,4 +1,3 @@
-import React, { useEffect } from 'react';
 import { LayoutTypeStr, TidyComponent } from '../TidyComponent';
 import { Col, Row } from 'antd';
 

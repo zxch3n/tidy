@@ -1,7 +1,7 @@
 import { Row, Switch, Button } from 'antd';
 import { SVGProps, useEffect, useRef, useState } from 'react';
 import { Renderer } from '../renderer';
-import { InnerNode, Node } from '../tidy';
+import { InnerNode } from '../tidy';
 import { LayoutTypeStr, TidyComponent } from '../TidyComponent';
 import { createTree } from '../utils';
 import { LayeredVsNonLayered, Card } from './LayeredVsNonLayered';

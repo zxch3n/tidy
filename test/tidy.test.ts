@@ -2,7 +2,6 @@ import { TidyLayout, initWasm, LayoutType } from '../src/tidy';
 import { beforeAll, expect, describe, it } from 'vitest';
 import { createTree } from '../src/utils';
 import { readFile } from 'fs/promises';
-import { writeFileSync } from 'fs';
 import { debugStrToTree } from '../src/stories/debugToTree';
 import * as path from 'path';
 
