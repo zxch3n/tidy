@@ -26,6 +26,7 @@ describe('tidy', () => {
   });
 
   it('debug', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const tree =
       debugStrToTree(`x: 0, y: 0, width: 2, height: 5, rx: 11.158500000000002, mod: -11.158500000000002
     x: -11.1585, y: 5.001, width: 1, height: 5, rx: 13.315000000000001, mod: -13.315000000000001
