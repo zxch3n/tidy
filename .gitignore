@@ -9,3 +9,6 @@ storybook-static/
 .cache/
 *.log
 .DS_Store
+
+# Nix
+result*
