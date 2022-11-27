@@ -34,7 +34,7 @@ interface Props {
 export const TidyLayout = ({
   layoutType,
   num,
-  ...props
+  ..._props
 }: Props & { num: number }) => {
   const [updateTrigger, setUpdate] = useState(0);
   const [root] = useState(() => {
