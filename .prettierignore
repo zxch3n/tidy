@@ -14,3 +14,4 @@ storybook-static/
 .DS_Store
 .github/
 result*
+.buildkite/

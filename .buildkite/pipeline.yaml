@@ -1,0 +1,24 @@
+agents:
+  public: "true"
+  os: "linux"
+
+steps:
+  - command: nix-buildkite
+    label: ":nixos: :buildkite:"
+    plugins:
+      - circuithub/nix-buildkite:
+          file: ci.nix
+
+  - label: ":nixos: Archive Nix flake inputs"
+    command: nix flake archive .#
+
+  - wait
+
+  - label: ":nixos: :linux: Cache the Nix shell"
+    command: |
+      nix develop --print-build-logs --profile /tmp/tidy --command echo "done"
+  - label: ":nixos: :macos: Cache the Nix shell"
+    command: |
+      nix develop --print-build-logs --profile /tmp/tidy --command echo "done"
+    agents:
+      os: "darwin"
