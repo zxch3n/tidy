@@ -78,7 +78,12 @@ export function TidyExample() {
           value={num}
           min={10}
           max={1000}
-          onChange={(v) => setNum(v)}
+          type="number"
+          onChange={(v) => {
+            if (v) {
+              setNum(v);
+            }
+          }}
           addonAfter="Nodes"
           style={{ width: 140, marginRight: 20 }}
         />
