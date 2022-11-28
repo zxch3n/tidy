@@ -182,6 +182,41 @@
           };
         };
 
-      flake = { };
+      flake =
+        let
+          pkgs = inputs.nixpkgs.legacyPackages."x86_64-linux";
+          recurseIntoHydraJobs = set:
+            let
+              scrubForNix = name: builtins.replaceStrings [ ":" ] [ "-" ] name;
+              recurse = path: set:
+                let
+                  g =
+                    name: value: pkgs.lib.nameValuePair (scrubForNix name) (
+                      if pkgs.lib.isAttrs value
+                      then ((recurse (path ++ [ name ]) value) // { recurseForDerivations = true; })
+                      else value
+                    );
+                in
+                pkgs.lib.mapAttrs' g set;
+            in
+            recurse [ ] set;
+        in
+        {
+          hydraJobs = {
+            inherit (self) packages;
+          }
+          // {
+            required = pkgs.releaseTools.aggregate {
+              name = "required";
+              constituents = builtins.map builtins.attrValues (with self.hydraJobs; [
+                packages.x86_64-linux
+                packages.aarch64-darwin
+              ]);
+              meta.description = "Required CI builds";
+            };
+          };
+
+          ciJobs = recurseIntoHydraJobs self.hydraJobs;
+        };
     };
 }
