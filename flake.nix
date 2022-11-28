@@ -66,6 +66,18 @@
         )
       ];
 
+      # Filter out source that shouldn't cause a Nix rebuild.
+      customFilter = src:
+        let
+          srcIgnored = inputs.gitignore.lib.gitignoreFilterWith {
+            basePath = src;
+            extraRules = ''
+              *.nix
+            '';
+          };
+        in
+        path: type:
+          srcIgnored path type;
     in
     flake-parts.lib.mkFlake { inherit self; } {
       systems = [
@@ -129,7 +141,11 @@
             pname = "tidy";
             inherit version;
 
-            src = ./.;
+            src = pkgs.lib.cleanSourceWith {
+              filter = customFilter ./.;
+              src = ./.;
+              name = "tidy-source";
+            };
 
             npmDepsHash = "sha256-rE8XdEqEzWSjnpdOGPbILTJJubnrK/v80f/iZBhIqB8=";
             npmFlags = [ "--legacy-peer-deps" ];
