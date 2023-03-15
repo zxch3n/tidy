@@ -62,11 +62,11 @@ export class TidyLayout extends Disposable {
   private constructor(type: LayoutType = LayoutType.Tidy) {
     super();
     if (type === LayoutType.Basic) {
-      this.tidy = TidyWasm.with_basic_layout(40, 10);
+      this.tidy = TidyWasm.with_basic_layout(15, 15);
     } else if (type === LayoutType.Tidy) {
-      this.tidy = TidyWasm.with_tidy_layout(40, 10);
+      this.tidy = TidyWasm.with_tidy_layout(15, 15);
     } else if (type === LayoutType.LayeredTidy) {
-      this.tidy = TidyWasm.with_layered_tidy(40, 10);
+      this.tidy = TidyWasm.with_layered_tidy(15, 15);
     } else {
       throw new Error('not implemented');
     }
