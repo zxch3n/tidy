@@ -2,6 +2,15 @@
 name = "tidy-tree"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/zxch3n/tidy"
+description = "A tree visualization tool"
+repository = "https://github.com/zxch3n/tidy"
+authors = ["Zixuan Chen <remch183@outlook.com>"]
+keywords = ["visualization"]
+include = ["Cargo.toml", "**/*.rs"]
+documentation = "https://docs.rs/tidy-tree"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
