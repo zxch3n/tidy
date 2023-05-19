@@ -321,4 +321,13 @@ impl Node {
 
         s
     }
+
+    pub fn clear_layout_info(&mut self) {
+        self.x = 0.;
+        self.y = 0.;
+        self.tidy = None;
+        self.relative_x = 0.;
+        self.relative_y = 0.;
+        self.bbox = Default::default();
+    }
 }

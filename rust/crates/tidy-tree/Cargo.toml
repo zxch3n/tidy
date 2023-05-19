@@ -19,4 +19,9 @@ num = "0.4.0"
 tinyset = "0.4.10"
 
 [dev-dependencies]
+criterion = "0.4.0"
 rand = "0.8.5"
+
+[[bench]]
+name = "bench"
+harness = false
