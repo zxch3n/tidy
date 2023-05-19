@@ -1,6 +1,6 @@
 use std::ptr::NonNull;
 
-use tidy_tree::{geometry::*, Layout, Node};
+use tidy_tree::{geometry::*, Layout, Link, Node};
 
 pub fn assert_no_overlap_nodes(root: &Node) {
     let mut nodes: Vec<NonNull<Node>> = vec![];
@@ -21,6 +21,7 @@ pub fn check_nodes_order(root: &Node) {
     root.pre_order_traversal(|node| {
         let mut prev = None;
         for child in node.children.iter() {
+            let child = child.borrow();
             if let Some(prev) = prev {
                 assert!(prev < child.x);
             }
@@ -34,6 +35,7 @@ pub fn check_y_position_in_same_level(root: &Node) {
     root.pre_order_traversal(|node| {
         let mut prev = None;
         for child in node.children.iter() {
+            let child = child.borrow();
             if let Some(prev) = prev {
                 assert_eq!(prev, child.y);
             }
@@ -48,6 +50,7 @@ pub fn assert_no_crossed_lines(root: &Node) {
     // println!("{}", &root.str());
     root.post_order_traversal(|node| {
         for child in node.children.iter() {
+            let child = child.borrow();
             let line = Line {
                 from: Point {
                     x: node.x,
@@ -74,13 +77,13 @@ pub fn assert_no_crossed_lines(root: &Node) {
 
 pub fn assert_symmetric(root: &Node, layout: &mut dyn Layout) {
     let mut mirrored = mirror(root);
-    layout.layout(&mut mirrored);
+    layout.layout(&mut mirrored.borrow_mut());
     let mut point_origin: Vec<Coord> = vec![];
     let mut point_mirrored: Vec<Coord> = vec![];
     root.pre_order_traversal(|node| {
         point_origin.push(node.x);
     });
-    pre_order_traversal_rev(&mirrored, |node| {
+    pre_order_traversal_rev(&mirrored.borrow(), |node| {
         point_mirrored.push(node.x);
     });
 
@@ -88,7 +91,7 @@ pub fn assert_symmetric(root: &Node, layout: &mut dyn Layout) {
     for i in 0..point_origin.len() {
         if (point_origin[i] + point_mirrored[i]).abs() > 1e-6 {
             println!("{}", root.str());
-            println!("{}", mirrored.str());
+            println!("{}", mirrored.borrow().str());
             panic!("{} != {}", point_origin[i], point_mirrored[i]);
         }
     }
@@ -97,20 +100,20 @@ pub fn assert_symmetric(root: &Node, layout: &mut dyn Layout) {
     where
         F: FnMut(&Node),
     {
-        let mut stack: Vec<NonNull<Node>> = vec![node.into()];
+        let mut stack: Vec<Link> = vec![node.me_rc()];
         while let Some(mut node) = stack.pop() {
-            let node = unsafe { node.as_mut() };
-            f(node);
+            let node = node.borrow();
+            f(&node);
             for child in node.children.iter().rev() {
-                stack.push(child.as_ref().into());
+                stack.push(child.borrow().me_rc());
             }
         }
     }
 }
 
-fn mirror(root: &Node) -> Node {
-    let mut root = root.clone();
-    root.post_order_traversal_mut(|node| {
+fn mirror(root: &Node) -> Link {
+    let mut root = root.clone_subtree();
+    root.borrow_mut().post_order_traversal_mut(|node| {
         node.x = 0.;
         node.y = 0.;
         node.relative_x = 0.;

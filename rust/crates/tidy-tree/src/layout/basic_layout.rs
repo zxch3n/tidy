@@ -2,7 +2,11 @@ use num::Float;
 
 use super::Layout;
 use crate::{geometry::Coord, node::Node};
-use std::cmp::{max, min};
+use std::{
+    borrow::Borrow,
+    cell::RefCell,
+    cmp::{max, min},
+};
 
 /// <img src="https://i.ibb.co/BLCfz0g/image.png" width="300" alt="Relative position"/>
 ///
@@ -43,16 +47,12 @@ impl Layout for BasicLayout {
             self.update_meta(node);
         });
         root.pre_order_traversal_mut(|node| {
-            if let Some(mut parent) = node.parent {
-                let parent = unsafe { parent.as_mut() };
+            if let Some(parent) = node.parent() {
+                let parent = RefCell::borrow(&parent);
                 node.x = parent.x + node.relative_x;
                 node.y = parent.y + node.relative_y;
             }
         });
-    }
-
-    fn partial_layout(&mut self, root: &mut Node, changed: &[std::ptr::NonNull<Node>]) {
-        todo!()
     }
 
     fn parent_child_margin(&self) -> Coord {
@@ -62,9 +62,20 @@ impl Layout for BasicLayout {
     fn peer_margin(&self) -> Coord {
         self.peer_margin
     }
+
+    fn partial_layout(&mut self, root: &mut Node, changed: &[crate::node::WeakLink]) {
+        todo!()
+    }
 }
 
 impl BasicLayout {
+    pub fn new(parent_child_margin: Coord, peer_margin: Coord) -> Self {
+        Self {
+            parent_child_margin,
+            peer_margin,
+        }
+    }
+
     fn update_meta(&mut self, node: &mut Node) {
         node.bbox = BoundingBox {
             total_height: node.height,
@@ -78,6 +89,7 @@ impl BasicLayout {
             let mut max_height = 0.;
             let n = children.len();
             for (i, child) in children.iter_mut().enumerate() {
+                let mut child = child.borrow_mut();
                 child.relative_y = node.height + self.parent_child_margin;
                 child.relative_x = temp_x + child.bbox.total_width / 2.;
                 temp_x += child.bbox.total_width + self.peer_margin;
@@ -87,7 +99,7 @@ impl BasicLayout {
             let children_width = temp_x - self.peer_margin;
             let shift_x = -children_width / 2.;
             for child in children.iter_mut() {
-                child.relative_x += shift_x;
+                child.borrow_mut().relative_x += shift_x;
             }
 
             node.bbox.total_width = Float::max(children_width, node.width);
@@ -103,10 +115,11 @@ mod basic_layout_test {
 
     #[test]
     fn easy_test_0() {
-        let mut root = Node::new(0, 10., 10.);
+        let mut root_ = Node::new(0, 10., 10.);
+        let mut root = root_.borrow_mut();
         root.append_child(Node::new(1, 10., 10.));
         let mut second = Node::new(2, 10., 10.);
-        second.append_child(Node::new(3, 10., 10.));
+        second.borrow_mut().append_child(Node::new(3, 10., 10.));
         root.append_child(second);
         root.append_child(Node::new(4, 10., 10.));
         let mut layout = BasicLayout {

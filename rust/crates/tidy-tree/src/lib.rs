@@ -5,12 +5,12 @@ mod layout;
 mod node;
 mod utils;
 pub use iter::Iter;
-use std::{any::Any, collections::HashMap, ptr::NonNull};
+use std::{any::Any, collections::HashMap, ptr::NonNull, rc::Rc};
 
 use geometry::Coord;
 use layout::BoundingBox;
 pub use layout::{BasicLayout, Layout, TidyLayout};
-pub use node::Node;
+pub use node::{Link, Node, WeakLink};
 
 #[derive(PartialEq, Eq)]
 pub enum LayoutType {
@@ -20,17 +20,17 @@ pub enum LayoutType {
 }
 
 pub struct TidyTree {
-    root: Node,
+    root: Link,
     layout_type: LayoutType,
     layout: Box<dyn Layout>,
-    map: HashMap<usize, NonNull<Node>>,
+    map: HashMap<usize, WeakLink>,
 }
 
 impl TidyTree {
     pub fn with_basic_layout(parent_child_margin: Coord, peer_margin: Coord) -> Self {
         TidyTree {
             layout_type: LayoutType::Basic,
-            root: Default::default(),
+            root: Node::new(0, 0., 0.),
             layout: Box::new(BasicLayout {
                 parent_child_margin,
                 peer_margin,
@@ -42,7 +42,7 @@ impl TidyTree {
     pub fn with_tidy_layout(parent_child_margin: Coord, peer_margin: Coord) -> Self {
         TidyTree {
             layout_type: LayoutType::Tidy,
-            root: Default::default(),
+            root: Node::new(0, 0., 0.),
             layout: Box::new(TidyLayout::new(parent_child_margin, peer_margin)),
             map: HashMap::new(),
         }
@@ -51,7 +51,7 @@ impl TidyTree {
     pub fn with_layered_tidy(parent_child_margin: Coord, peer_margin: Coord) -> Self {
         TidyTree {
             layout_type: LayoutType::Tidy,
-            root: Default::default(),
+            root: Node::new(0, 0., 0.),
             layout: Box::new(TidyLayout::new_layered(parent_child_margin, peer_margin)),
             map: HashMap::new(),
         }
@@ -83,21 +83,19 @@ impl TidyTree {
     }
 
     pub fn is_empty(&self) -> bool {
-        self.root.id == usize::MAX
+        self.root.borrow().id == usize::MAX
     }
 
     pub fn add_node(&mut self, id: usize, width: Coord, height: Coord, parent_id: usize) {
         let node = Node::new(id, width, height);
         if self.is_empty() || parent_id == usize::MAX {
             self.root = node;
-            self.map.insert(id, (&self.root).into());
+            self.map.insert(id, Rc::downgrade(&self.root));
             return;
         }
 
-        let mut parent = *self.map.get(&parent_id).unwrap();
-        let parent = unsafe { parent.as_mut() };
-
-        let ptr = parent.append_child(node);
+        let parent = self.map.get(&parent_id).unwrap();
+        let ptr = parent.upgrade().unwrap().borrow_mut().append_child(node);
         self.map.insert(id, ptr);
     }
 
@@ -107,11 +105,12 @@ impl TidyTree {
         }
 
         if let Some(node) = self.map.get(&id) {
-            let node = unsafe { &mut *node.as_ptr() };
+            let ref_cell = &node.upgrade().unwrap();
+            let node = ref_cell.borrow_mut();
             node.pre_order_traversal(|node| {
                 self.map.remove(&node.id);
             });
-            node.parent_mut().unwrap().remove_child(id);
+            node.parent().unwrap().borrow_mut().remove_child(id);
         }
     }
 
@@ -129,13 +128,14 @@ impl TidyTree {
             return;
         }
 
-        self.layout.layout(&mut self.root);
+        self.layout.layout(&mut *self.root.borrow_mut());
     }
 
     pub fn get_pos(&self) -> Vec<Coord> {
         let mut ans = vec![];
         for (id, node) in self.map.iter() {
-            let node = unsafe { node.as_ref() };
+            let ref_cell = &node.upgrade().unwrap();
+            let node = ref_cell.borrow();
             ans.push((*id) as Coord);
             ans.push(node.x);
             ans.push(node.y);

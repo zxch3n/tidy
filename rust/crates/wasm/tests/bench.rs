@@ -3,7 +3,6 @@ use wasm::Tidy;
 use web_sys::{self, Performance};
 
 mod gen;
-use gen::gen_tree;
 extern crate wasm_bindgen_test;
 use wasm_bindgen_test::*;
 
@@ -19,13 +18,14 @@ fn bench_tidy() {
     for num in (1000..110_000).step_by(1000) {
         let mut layout = Tidy::with_tidy_layout(10., 10.);
         let tree = gen::gen_tree(&mut rng, num);
+        let tree = tree.borrow();
         tree.pre_order_traversal(|node| {
             if node.parent.is_some() {
                 layout.add_node(
                     node.id,
                     node.width,
                     node.height,
-                    unsafe { node.parent.unwrap().as_ref() }.id,
+                    node.parent().unwrap().borrow().id,
                 );
             } else {
                 layout.add_node(node.id, node.width, node.height, Tidy::null_id());
