@@ -1,57 +1,31 @@
 use crate::Node;
 
 pub struct Iter<'a> {
-    node: &'a Node,
-    slot_stack: Vec<usize>,
-    finished: bool,
+    nodes: Vec<&'a Node>,
 }
 
 impl<'a> Iterator for Iter<'a> {
     type Item = &'a Node;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.finished {
-            return None;
-        }
+        self.nodes.pop()
+    }
+}
 
-        let ans = self.node;
-        if !self.node.children.is_empty() {
-            self.node = &self.node.children[0];
-            self.slot_stack.push(0);
-            return Some(ans);
-        } else if self.node.parent.is_some() {
-            let mut parent = unsafe { self.node.parent.unwrap().as_ref() };
-            let mut index_slot = self.slot_stack.pop().unwrap();
-            while parent.children.len() <= index_slot + 1
-                && !self.slot_stack.is_empty()
-                && parent.parent.is_some()
-            {
-                parent = unsafe { parent.parent.unwrap().as_ref() };
-                index_slot = self.slot_stack.pop().unwrap();
-            }
-
-            if parent.children.len() > index_slot + 1 {
-                self.node = &parent.children[index_slot + 1];
-                self.slot_stack.push(index_slot + 1);
-                return Some(ans);
-            } else {
-                self.finished = true;
-                return Some(ans);
-            }
-        }
-
-        Some(ans)
+fn recursive_iter<'a>(node: &'a Node, nodes: &mut Vec<&'a Node>) {
+    nodes.push(node);
+    for child in node.children.iter() {
+        recursive_iter(child, nodes);
     }
 }
 
 impl Node {
     #[inline]
     pub fn iter(&self) -> Iter {
-        Iter {
-            node: self,
-            slot_stack: vec![],
-            finished: false,
-        }
+        let mut nodes = Vec::new();
+        recursive_iter(self, &mut nodes);
+        nodes.reverse();
+        Iter { nodes }
     }
 }
 
@@ -65,6 +39,11 @@ mod iter_test {
         assert_eq!(root.iter().count(), 2);
         root.append_child(Node::new(2, 3., 3.));
         assert_eq!(root.iter().count(), 3);
+        root.append_child(Node::new(3, 3., 3.));
+        assert_eq!(root.iter().count(), 4);
+        root.children[2].append_child(Node::new(4, 3., 3.));
+        assert_eq!(root.iter().count(), 5);
+
         for (i, node) in root.iter().enumerate() {
             assert_eq!(i, node.id);
         }
