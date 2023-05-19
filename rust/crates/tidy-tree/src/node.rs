@@ -147,7 +147,7 @@ impl Node {
         self.tidy.as_ref().unwrap()
     }
 
-    fn reset_parent_link(&mut self) {
+    fn reset_parent_link_of_children(&mut self) {
         if self.children.is_empty() {
             return;
         }
@@ -161,8 +161,8 @@ impl Node {
     pub fn append_child(&mut self, mut child: Self) -> NonNull<Self> {
         child.parent = Some(self.into());
         let mut boxed = Box::new(child);
-        boxed.reset_parent_link();
-        let ptr = boxed.as_ref().into();
+        boxed.reset_parent_link_of_children();
+        let ptr = boxed.as_mut().into();
         self.children.push(boxed);
         ptr
     }
@@ -202,7 +202,7 @@ impl Node {
 
             stack.push((node_ptr, false));
             for child in node.children.iter_mut() {
-                stack.push((child.as_ref().into(), true));
+                stack.push((child.as_mut().into(), true));
             }
         }
     }
@@ -221,7 +221,7 @@ impl Node {
 
             stack.push((node_ptr, false));
             for child in node.children.iter_mut() {
-                stack.push((child.as_ref().into(), true));
+                stack.push((child.as_mut().into(), true));
             }
         }
     }
@@ -235,7 +235,7 @@ impl Node {
             let node = unsafe { node.as_mut() };
             f(node);
             for child in node.children.iter_mut() {
-                stack.push(child.as_ref().into());
+                stack.push(child.as_mut().into());
             }
         }
     }
@@ -249,7 +249,7 @@ impl Node {
             let node = unsafe { node.as_mut() };
             f(node);
             for child in node.children.iter_mut() {
-                stack.push(child.as_ref().into());
+                stack.push(child.as_mut().into());
             }
         }
     }
@@ -264,7 +264,7 @@ impl Node {
             let node = unsafe { node.as_mut() };
             f(node, depth);
             for child in node.children.iter_mut() {
-                queue.push_back((child.as_ref().into(), depth + 1));
+                queue.push_back((child.as_mut().into(), depth + 1));
             }
         }
     }
@@ -285,7 +285,7 @@ impl Node {
             let node = unsafe { node.as_mut() };
             f(node, depth);
             for child in node.children.iter_mut() {
-                stack.push((child.as_ref().into(), depth + 1));
+                stack.push((child.as_mut().into(), depth + 1));
             }
         }
     }

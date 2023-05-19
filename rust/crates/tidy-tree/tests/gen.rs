@@ -19,23 +19,23 @@ pub fn gen_node(rng: &mut StdRng) -> Node {
     }
 }
 
-pub fn gen_tree(rng: &mut StdRng, num: usize) -> Node {
-    let root = gen_node(rng);
-    let mut nodes: Vec<NonNull<Node>> = vec![(&root).into()];
+pub fn gen_tree(rng: &mut StdRng, num: usize) -> Box<Node> {
+    let mut root = Box::new(gen_node(rng));
+    let mut nodes: Vec<NonNull<Node>> = vec![(&mut *root).into()];
     for _ in 0..num {
         let parent_index = rng.gen_range(0..nodes.len());
         let parent = unsafe { nodes[parent_index].as_mut() };
         let node = gen_node(rng);
         parent.append_child(node);
-        nodes.push(parent.children.last().unwrap().as_ref().into());
+        nodes.push(parent.children.last_mut().unwrap().as_mut().into());
     }
 
     root
 }
 
-pub fn prepare_tree(rng: &mut StdRng) -> (Node, Vec<NonNull<Node>>) {
-    let root = gen_node(rng);
-    let nodes: Vec<NonNull<Node>> = vec![(&root).into()];
+pub fn prepare_tree(rng: &mut StdRng) -> (Box<Node>, Vec<NonNull<Node>>) {
+    let mut root = Box::new(gen_node(rng));
+    let nodes: Vec<NonNull<Node>> = vec![(&mut *root).into()];
     (root, nodes)
 }
 

@@ -43,8 +43,8 @@ impl Layout for BasicLayout {
             self.update_meta(node);
         });
         root.pre_order_traversal_mut(|node| {
-            if let Some(parent) = node.parent {
-                let parent = unsafe { parent.as_ref() };
+            if let Some(mut parent) = node.parent {
+                let parent = unsafe { parent.as_mut() };
                 node.x = parent.x + node.relative_x;
                 node.y = parent.y + node.relative_y;
             }

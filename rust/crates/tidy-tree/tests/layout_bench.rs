@@ -3,7 +3,7 @@
 mod aesthetic_rules;
 mod gen;
 
-use std::{time::Instant};
+use std::time::Instant;
 
 use rand::{prelude::StdRng, SeedableRng};
 use tidy_tree::{BasicLayout, Layout, TidyLayout};

@@ -45,6 +45,7 @@ pub fn check_y_position_in_same_level(root: &Node) {
 
 pub fn assert_no_crossed_lines(root: &Node) {
     let mut lines: Vec<Line> = vec![];
+    // println!("{}", &root.str());
     root.post_order_traversal(|node| {
         for child in node.children.iter() {
             let line = Line {
