@@ -15,7 +15,7 @@ impl<'a> Iterator for Iter<'a> {
         }
 
         let ans = self.node;
-        if self.node.children.len() > 0 {
+        if !self.node.children.is_empty() {
             self.node = &self.node.children[0];
             self.slot_stack.push(0);
             return Some(ans);
@@ -23,7 +23,7 @@ impl<'a> Iterator for Iter<'a> {
             let mut parent = unsafe { self.node.parent.unwrap().as_ref() };
             let mut index_slot = self.slot_stack.pop().unwrap();
             while parent.children.len() <= index_slot + 1
-                && self.slot_stack.len() > 0
+                && !self.slot_stack.is_empty()
                 && parent.parent.is_some()
             {
                 parent = unsafe { parent.parent.unwrap().as_ref() };
@@ -40,7 +40,7 @@ impl<'a> Iterator for Iter<'a> {
             }
         }
 
-        return Some(ans);
+        Some(ans)
     }
 }
 

@@ -55,13 +55,13 @@ pub struct Node {
 impl Clone for Node {
     fn clone(&self) -> Self {
         let mut root = Self {
-            id: self.id.clone(),
-            width: self.width.clone(),
-            height: self.height.clone(),
-            x: self.x.clone(),
-            y: self.y.clone(),
-            relative_x: self.relative_x.clone(),
-            relative_y: self.relative_y.clone(),
+            id: self.id,
+            width: self.width,
+            height: self.height,
+            x: self.x,
+            y: self.y,
+            relative_x: self.relative_x,
+            relative_y: self.relative_y,
             bbox: self.bbox.clone(),
             parent: None,
             children: self.children.clone(),
@@ -128,11 +128,11 @@ impl Node {
     }
 
     pub fn parent_mut(&mut self) -> Option<&mut Self> {
-        unsafe { self.parent.map_or(None, |mut node| Some(node.as_mut())) }
+        unsafe { self.parent.map(|mut node| node.as_mut()) }
     }
 
     pub fn parent(&self) -> Option<&Self> {
-        unsafe { self.parent.map_or(None, |node| Some(node.as_ref())) }
+        unsafe { self.parent.map(|node| node.as_ref()) }
     }
 
     pub fn bottom(&self) -> Coord {
@@ -148,7 +148,7 @@ impl Node {
     }
 
     fn reset_parent_link(&mut self) {
-        if self.children.len() == 0 {
+        if self.children.is_empty() {
             return;
         }
 
@@ -310,8 +310,8 @@ impl Node {
             ));
         }
         for child in self.children.iter() {
-            for line in child.str().split("\n") {
-                if line.len() == 0 {
+            for line in child.str().split('\n') {
+                if line.is_empty() {
                     continue;
                 }
 

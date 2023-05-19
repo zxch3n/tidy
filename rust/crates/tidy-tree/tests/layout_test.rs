@@ -84,7 +84,7 @@ pub fn align_partial_layout_with_full_layout(layout: &mut dyn Layout) {
 }
 
 fn change_random_node(rng: &mut StdRng, nodes: &[NonNull<Node>]) -> NonNull<Node> {
-    let node_index = rng.gen_range(0..nodes.len()) as usize;
+    let node_index = rng.gen_range(0..nodes.len());
     let node = unsafe { &mut *nodes[node_index].as_ptr() };
     node.width = rng.gen_range(1. ..100.);
     node.height = rng.gen_range(1. ..100.);
@@ -92,7 +92,7 @@ fn change_random_node(rng: &mut StdRng, nodes: &[NonNull<Node>]) -> NonNull<Node
 }
 
 fn insert_random_node(rng: &mut StdRng, nodes: &[NonNull<Node>]) -> NonNull<Node> {
-    let node_index = rng.gen_range(0..nodes.len()) as usize;
+    let node_index = rng.gen_range(0..nodes.len());
     let node = unsafe { &mut *nodes[node_index].as_ptr() };
     let new_node = gen_node(rng);
     node.append_child(new_node)

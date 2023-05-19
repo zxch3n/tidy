@@ -3,15 +3,15 @@
 mod aesthetic_rules;
 mod gen;
 
-use std::{os::macos::raw::stat, time::Instant};
+use std::{time::Instant};
 
 use rand::{prelude::StdRng, SeedableRng};
-use tidy_tree::{BasicLayout, Layout, Node, TidyLayout};
+use tidy_tree::{BasicLayout, Layout, TidyLayout};
 extern crate test;
 use test::{black_box, Bencher};
 
 #[bench]
-fn bench_tidy_layout_chart(bench: &mut Bencher) {
+fn bench_tidy_layout_chart(_bench: &mut Bencher) {
     let mut layout = TidyLayout::new(10., 10.);
 
     let mut rng = StdRng::seed_from_u64(1001);
@@ -36,7 +36,7 @@ fn bench_tidy_layout_chart(bench: &mut Bencher) {
 }
 
 #[bench]
-fn bench_naive_layout_chart(bench: &mut Bencher) {
+fn bench_naive_layout_chart(_bench: &mut Bencher) {
     let mut layout = BasicLayout {
         parent_child_margin: 10.,
         peer_margin: 10.,

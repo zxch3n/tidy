@@ -90,7 +90,7 @@ impl Contour {
         if let Some(mut current) = self.current {
             let node = unsafe { current.as_mut() };
             if self.is_left {
-                if node.children.len() > 0 {
+                if !node.children.is_empty() {
                     self.current = Some((&**node.children.first().unwrap()).into());
                     let node = self.node();
                     self.modifier_sum += node.tidy.as_ref().unwrap().modifier_to_subtree;
@@ -98,15 +98,13 @@ impl Contour {
                     self.modifier_sum += node.tidy().modifier_thread_left;
                     self.current = node.tidy().thread_left;
                 }
+            } else if !node.children.is_empty() {
+                self.current = Some((&**node.children.last().unwrap()).into());
+                let node = self.node();
+                self.modifier_sum += node.tidy.as_ref().unwrap().modifier_to_subtree;
             } else {
-                if node.children.len() > 0 {
-                    self.current = Some((&**node.children.last().unwrap()).into());
-                    let node = self.node();
-                    self.modifier_sum += node.tidy.as_ref().unwrap().modifier_to_subtree;
-                } else {
-                    self.modifier_sum += node.tidy().modifier_thread_right;
-                    self.current = node.tidy().thread_right;
-                }
+                self.modifier_sum += node.tidy().modifier_thread_right;
+                self.current = node.tidy().thread_right;
             }
             if self.current.is_some() {
                 let node = self.node();
@@ -118,8 +116,8 @@ impl Contour {
 impl Node {
     fn set_extreme(&mut self) {
         let self_ptr: NonNull<Node> = self.into();
-        let mut tidy = self.tidy.as_mut().unwrap();
-        if self.children.len() == 0 {
+        let tidy = self.tidy.as_mut().unwrap();
+        if self.children.is_empty() {
             tidy.extreme_left = Some(self_ptr);
             tidy.extreme_right = Some(self_ptr);
             tidy.modifier_extreme_left = 0.;
@@ -284,7 +282,7 @@ impl TidyLayout {
         distance: Coord,
     ) {
         let child = &mut node.children[current_index];
-        let mut child_tidy = child.tidy_mut();
+        let child_tidy = child.tidy_mut();
         // debug_assert!(distance <= 1e6);
         child_tidy.modifier_to_subtree += distance;
 
@@ -339,7 +337,7 @@ impl TidyLayout {
     }
 
     fn first_walk(&mut self, node: &mut Node) {
-        if node.children.len() == 0 {
+        if node.children.is_empty() {
             node.set_extreme();
             return;
         }
@@ -364,7 +362,7 @@ impl TidyLayout {
             return;
         }
 
-        if node.children.len() == 0 {
+        if node.children.is_empty() {
             node.set_extreme();
             return;
         }
@@ -412,7 +410,7 @@ impl TidyLayout {
 
 impl Layout for TidyLayout {
     fn layout(&mut self, root: &mut Node) {
-        root.pre_order_traversal_mut(|node| init_node(node));
+        root.pre_order_traversal_mut(init_node);
         self.set_y_recursive(root);
         self.first_walk(root);
         self.second_walk(root, 0.);
@@ -503,12 +501,12 @@ fn init_node(node: &mut Node) {
 
 fn invalidate_extreme_thread(node: &mut Node) {
     node.set_extreme();
-    let mut e_left = node.extreme_left().tidy_mut();
+    let e_left = node.extreme_left().tidy_mut();
     e_left.thread_left = None;
     e_left.thread_right = None;
     e_left.modifier_thread_left = 0.;
     e_left.modifier_thread_right = 0.;
-    let mut e_right = node.extreme_right().tidy_mut();
+    let e_right = node.extreme_right().tidy_mut();
     e_right.thread_left = None;
     e_right.thread_right = None;
     e_right.modifier_thread_left = 0.;

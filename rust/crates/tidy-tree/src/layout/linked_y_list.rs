@@ -43,10 +43,6 @@ impl LinkedYList {
     }
 
     pub fn pop(mut self) -> Option<Self> {
-        if let Some(next) = self.next.take() {
-            return Some(*next);
-        } else {
-            return None;
-        }
+        self.next.take().map(|next| *next)
     }
 }
