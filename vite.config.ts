@@ -30,13 +30,8 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),
       name: 'tidy',
-      fileName: (format) => {
-        if (format === 'es') {
-          return 'tidy.es.mjs';
-        }
-
-        return `tidy.${format}.js`;
-      },
+      fileName: 'tidy',
+      formats: ['es'],
     },
     rollupOptions: {
       external: ['react'],
